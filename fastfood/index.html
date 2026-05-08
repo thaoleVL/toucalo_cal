@@ -3,292 +3,294 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fast Food Calorie Counter — Tou Calo</title>
-<meta name="description" content="Calories, protein, carbs and fat for 80+ popular fast food items — Chipotle, McDonald's, Subway, KFC, Taco Bell, Starbucks and more.">
+<title>Fast Food Calorie Guide — Tou Calo</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,800;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{
-  font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:linear-gradient(160deg,#c8bbf0 0%,#d4c5f5 30%,#e0ceee 60%,#edd5e8 100%);
-  min-height:100vh;color:#0d2b35;
+body{font-family:'DM Sans',sans-serif;background:linear-gradient(160deg,#c8bbf0 0%,#d4c5f5 30%,#e0ceee 60%,#edd5e8 100%);min-height:100vh;color:#0d2b35;padding:28px 20px 48px}
+.wrap{max-width:760px;margin:0 auto}
+.top-logo{text-align:center;margin-bottom:18px}
+.top-logo span{font-size:15px;font-weight:600;color:#0d2b35}
+.top-logo span em{font-style:normal;color:#6B4FBB}
+h2{font-family:'Fraunces',serif;font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1.1;letter-spacing:-0.025em;color:#0d2b35;text-align:center;margin-bottom:5px}
+h2 em{font-style:italic;color:#6B4FBB}
+.subtitle{font-size:13px;color:#0d2b35;opacity:.55;text-align:center;margin-bottom:22px;line-height:1.5;font-weight:300}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:12px}
+.search-wrap::before{content:'🔍';position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+.search-input{width:100%;background:rgba(255,255,255,.75);border:1.5px solid rgba(255,255,255,.9);border-radius:14px;padding:13px 16px 13px 42px;font-size:15px;color:#0d2b35;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:#6B4FBB;background:#fff}
+.search-input::placeholder{color:#0d2b35;opacity:.4}
+
+/* RESTAURANT FILTER */
+.cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.cat-btn{padding:7px 14px;border-radius:100px;border:1.5px solid rgba(13,43,53,.12);background:rgba(255,255,255,.6);font-size:12px;font-weight:500;color:#0d2b35;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s;white-space:nowrap}
+.cat-btn.on{background:#0d2b35;color:#fff;border-color:#0d2b35}
+
+/* STATS */
+.stats-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.stat-pill{background:rgba(255,255,255,.5);border-radius:100px;padding:5px 12px;font-size:12px;color:#0d2b35;opacity:.7;border:1px solid rgba(255,255,255,.7)}
+.stat-pill strong{font-weight:600;opacity:1}
+.calorie-legend{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:4px;font-size:11px;color:#0d2b35;opacity:.6}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* TABLE */
+.table-card{background:rgba(255,255,255,.58);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,.82);margin-bottom:14px}
+.table-header{display:grid;grid-template-columns:2.5fr 1.2fr 0.8fr 0.8fr 0.8fr;gap:0;background:rgba(13,43,53,.06);padding:10px 16px;border-bottom:1px solid rgba(13,43,53,.08)}
+.th{font-size:10px;font-weight:700;color:#0d2b35;opacity:.5;letter-spacing:.06em;text-transform:uppercase;text-align:right}
+.th:first-child{text-align:left}
+
+.food-row{display:grid;grid-template-columns:2.5fr 1.2fr 0.8fr 0.8fr 0.8fr;gap:0;padding:11px 16px;border-bottom:0.5px solid rgba(13,43,53,.06);transition:background .15s;align-items:center}
+.food-row:last-child{border-bottom:none}
+.food-row:hover{background:rgba(255,255,255,.4)}
+.food-row.hidden{display:none}
+
+.food-info{display:flex;flex-direction:column;gap:2px}
+.food-name{font-size:13px;font-weight:500;color:#0d2b35;line-height:1.3}
+.food-brand{font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;display:inline-block;margin-top:2px;width:fit-content}
+
+/* brand colors */
+.brand-chipotle{background:rgba(165,42,42,.1);color:#7a1e1e}
+.brand-mcdonalds{background:rgba(255,188,0,.15);color:#7a5800}
+.brand-subway{background:rgba(0,128,0,.1);color:#1a5c1a}
+.brand-kfc{background:rgba(231,0,0,.1);color:#8b0000}
+.brand-tacobell{background:rgba(107,53,149,.12);color:#4a1f7a}
+.brand-pizza{background:rgba(231,111,81,.12);color:#8b3a1f}
+.brand-starbucks{background:rgba(0,112,74,.1);color:#004d33}
+.brand-wendys{background:rgba(206,57,0,.1);color:#8b2400}
+
+.td{font-size:12px;color:#0d2b35;text-align:right}
+.td.kcal{font-family:'Fraunces',serif;font-size:15px;font-weight:700}
+.kcal-low{color:#1a6b45}
+.kcal-med{color:#BA7517}
+.kcal-high{color:#B84A2A}
+.kcal-very-high{color:#8b1a1a}
+.td.protein{color:#1a6b45;font-size:12px}
+.td.carbs{color:#5B3DB8;font-size:12px}
+.td.fat{color:#B84A2A;font-size:12px}
+
+.no-results{text-align:center;padding:32px;font-size:13px;color:#0d2b35;opacity:.45;display:none}
+.no-results.show{display:block}
+.table-note{font-size:11px;color:#0d2b35;opacity:.38;text-align:center;padding:8px 16px;background:rgba(13,43,53,.03)}
+
+/* WARNING CARD */
+.warn-card{background:rgba(231,111,81,.1);border-radius:16px;padding:14px 16px;margin-bottom:14px;border:1px solid rgba(231,111,81,.2);font-size:12px;color:#0d2b35;line-height:1.55;display:flex;gap:9px}
+.warn-icon{font-size:1rem;flex-shrink:0;margin-top:1px}
+
+/* CTA */
+.cta-card{background:#0d2b35;border-radius:20px;padding:20px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.cta-title{font-family:'Fraunces',serif;font-size:15px;font-weight:800;color:#fff;margin-bottom:3px;line-height:1.2}
+.cta-sub{font-size:12px;color:rgba(255,255,255,.55);line-height:1.4}
+.cta-btn{background:#52B788;color:#fff;padding:10px 16px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;font-family:'DM Sans',sans-serif;flex-shrink:0;margin-left:auto}
+
+.foot{text-align:center;font-size:11px;color:rgba(13,43,53,.4);line-height:1.6}
+
+@media(max-width:520px){
+  .table-header,.food-row{grid-template-columns:2fr 1fr 1fr}
+  .th:nth-child(4),.th:nth-child(5),.td:nth-child(4),.td:nth-child(5){display:none}
 }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<!-- ── HERO ── -->
-<div style="text-align:center;padding:52px 40px 40px;max-width:960px;margin:0 auto">
-  <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#0d2b35;opacity:.5;display:block;margin-bottom:14px">
-    Fast Food Calorie Guide
-  </span>
-  <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:clamp(42px,6vw,70px);font-weight:700;line-height:1.05;letter-spacing:-0.02em;color:#0d2b35;margin:0 0 20px">
-    Fast Food<br><em style="font-style:italic;color:#6B4FBB">Calorie Counter</em>
-  </h1>
-  <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:18px;color:#0d2b35;opacity:.6;line-height:1.7;margin:0 auto;max-width:640px">
-    Calories, protein, carbs and fat for 80+ popular fast food items — Chipotle, McDonald's, Subway, KFC, Taco Bell, Starbucks and more. Search and filter by restaurant instantly.
-  </p>
+  <div class="top-logo"><span>tou <em>calo</em></span></div>
+  <h2>Fast Food <em>Calories</em></h2>
+  <p class="subtitle">Calories, protein, carbs and fat for 80+ popular fast food items. Search by food or filter by restaurant.</p>
+
+  <div class="warn-card">
+    <span class="warn-icon">⚠️</span>
+    <span>Fast food calories vary by location, customisation and portion size. Values shown are averages — always check the restaurant's official nutrition page for the most accurate data.</span>
+  </div>
+
+  <div class="search-wrap">
+    <input type="text" class="search-input" id="search" placeholder="Search burger, burrito, fries..." oninput="filterFoods()">
+  </div>
+
+  <div class="cats">
+    <button class="cat-btn on" onclick="setFilter('all',this)">All restaurants</button>
+    <button class="cat-btn" onclick="setFilter('chipotle',this)">🌯 Chipotle</button>
+    <button class="cat-btn" onclick="setFilter('mcdonalds',this)">🍟 McDonald's</button>
+    <button class="cat-btn" onclick="setFilter('subway',this)">🥙 Subway</button>
+    <button class="cat-btn" onclick="setFilter('kfc',this)">🍗 KFC</button>
+    <button class="cat-btn" onclick="setFilter('tacobell',this)">🌮 Taco Bell</button>
+    <button class="cat-btn" onclick="setFilter('starbucks',this)">☕ Starbucks</button>
+    <button class="cat-btn" onclick="setFilter('pizza',this)">🍕 Pizza</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-pill"><strong id="count">80</strong> items shown</div>
+    <div class="calorie-legend">
+      <div class="leg"><div class="leg-dot" style="background:#1a6b45"></div>&lt;300</div>
+      <div class="leg"><div class="leg-dot" style="background:#BA7517"></div>300–600</div>
+      <div class="leg"><div class="leg-dot" style="background:#B84A2A"></div>600–900</div>
+      <div class="leg"><div class="leg-dot" style="background:#8b1a1a"></div>900+</div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <div class="th">Item</div>
+      <div class="th">Calories</div>
+      <div class="th">Protein</div>
+      <div class="th">Carbs</div>
+      <div class="th">Fat</div>
+    </div>
+    <div id="food-list"></div>
+    <div class="no-results" id="no-results">No items found. Try a different search.</div>
+    <div class="table-note">Values are per standard serving · Customisations affect calories significantly</div>
+  </div>
+
+  <div class="cta-card">
+    <div>
+      <div class="cta-title">Ate fast food today? Log it in 3 seconds</div>
+      <div class="cta-sub">Snap a photo — Tou Calo's AI identifies the meal and counts the calories instantly</div>
+    </div>
+    <a href="https://apps.apple.com/us/app/tou-calo-ai-calorie-counter/id6698870692" class="cta-btn">Download Free</a>
+  </div>
+
+  <p class="foot">Sources: Restaurant official nutrition pages · USDA FoodData Central · Values are averages and may vary</p>
 </div>
 
-<!-- ── RESTAURANT QUICK LINKS ── -->
-<div style="max-width:1100px;margin:0 auto;padding:0 40px 40px">
-  <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+<script>
+var activeFilter = 'all';
 
-    <a href="#fastfood-db" style="display:flex;align-items:center;gap:10px;flex:1;min-width:160px;max-width:220px;background:rgba(165,42,42,.08);border-radius:16px;padding:16px;text-decoration:none;border:1px solid rgba(165,42,42,.15)">
-      <span style="font-size:24px">🌯</span>
-      <span>
-        <span style="font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:700;color:#0d2b35;display:block">Chipotle</span>
-        <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#0d2b35;opacity:.55">10 items · 250–800 kcal</span>
-      </span>
-    </a>
+function kcalClass(k){
+  if(k<300) return 'kcal-low';
+  if(k<600) return 'kcal-med';
+  if(k<900) return 'kcal-high';
+  return 'kcal-very-high';
+}
 
-    <a href="#fastfood-db" style="display:flex;align-items:center;gap:10px;flex:1;min-width:160px;max-width:220px;background:rgba(255,188,0,.1);border-radius:16px;padding:16px;text-decoration:none;border:1px solid rgba(255,188,0,.2)">
-      <span style="font-size:24px">🍟</span>
-      <span>
-        <span style="font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:700;color:#0d2b35;display:block">McDonald's</span>
-        <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#0d2b35;opacity:.55">14 items · 90–630 kcal</span>
-      </span>
-    </a>
+var foods = [
+  // CHIPOTLE
+  {name:'Burrito (chicken)',brand:'chipotle',brandLabel:'Chipotle',kcal:800,p:51,c:81,f:22},
+  {name:'Burrito (steak)',brand:'chipotle',brandLabel:'Chipotle',kcal:820,p:43,c:81,f:24},
+  {name:'Burrito Bowl (chicken)',brand:'chipotle',brandLabel:'Chipotle',kcal:525,p:48,c:45,f:16},
+  {name:'Burrito Bowl (veggie)',brand:'chipotle',brandLabel:'Chipotle',kcal:490,p:17,c:70,f:16},
+  {name:'Tacos (chicken, 3)',brand:'chipotle',brandLabel:'Chipotle',kcal:525,p:40,c:52,f:14},
+  {name:'Quesadilla (chicken)',brand:'chipotle',brandLabel:'Chipotle',kcal:790,p:51,c:55,f:38},
+  {name:'Chips & Guacamole',brand:'chipotle',brandLabel:'Chipotle',kcal:770,p:9,c:83,f:46},
+  {name:'Salad (chicken)',brand:'chipotle',brandLabel:'Chipotle',kcal:390,p:44,c:23,f:14},
+  {name:'Kids meal (chicken)',brand:'chipotle',brandLabel:'Chipotle',kcal:250,p:24,c:22,f:7},
+  {name:'Sofritas burrito',brand:'chipotle',brandLabel:'Chipotle',kcal:730,p:24,c:87,f:27},
+  // MCDONALD'S
+  {name:'Big Mac',brand:'mcdonalds',brandLabel:"McDonald's",kcal:563,p:26,c:45,f:32},
+  {name:'McDouble',brand:'mcdonalds',brandLabel:"McDonald's",kcal:400,p:23,c:36,f:17},
+  {name:'Quarter Pounder with Cheese',brand:'mcdonalds',brandLabel:"McDonald's",kcal:630,p:39,c:42,f:34},
+  {name:'McChicken',brand:'mcdonalds',brandLabel:"McDonald's",kcal:400,p:14,c:40,f:21},
+  {name:'Crispy Chicken Sandwich',brand:'mcdonalds',brandLabel:"McDonald's",kcal:470,p:27,c:46,f:20},
+  {name:'Egg McMuffin',brand:'mcdonalds',brandLabel:"McDonald's",kcal:310,p:17,c:30,f:13},
+  {name:'Sausage McMuffin',brand:'mcdonalds',brandLabel:"McDonald's",kcal:400,p:15,c:29,f:23},
+  {name:'Hotcakes (3)',brand:'mcdonalds',brandLabel:"McDonald's",kcal:590,p:10,c:102,f:16},
+  {name:'French Fries (small)',brand:'mcdonalds',brandLabel:"McDonald's",kcal:230,p:3,c:30,f:11},
+  {name:'French Fries (medium)',brand:'mcdonalds',brandLabel:"McDonald's",kcal:378,p:4,c:48,f:17},
+  {name:'French Fries (large)',brand:'mcdonalds',brandLabel:"McDonald's",kcal:490,p:7,c:65,f:23},
+  {name:'McFlurry (Oreo)',brand:'mcdonalds',brandLabel:"McDonald's",kcal:510,p:13,c:79,f:17},
+  {name:'Apple Pie',brand:'mcdonalds',brandLabel:"McDonald's",kcal:240,p:2,c:34,f:11},
+  {name:'Caesar Salad (no dressing)',brand:'mcdonalds',brandLabel:"McDonald's",kcal:90,p:7,c:8,f:4},
+  // SUBWAY
+  {name:'Italian BMT 6-inch',brand:'subway',brandLabel:'Subway',kcal:410,p:20,c:41,f:17},
+  {name:'Turkey Breast 6-inch',brand:'subway',brandLabel:'Subway',kcal:280,p:19,c:41,f:4},
+  {name:'Tuna 6-inch',brand:'subway',brandLabel:'Subway',kcal:480,p:21,c:43,f:24},
+  {name:'Veggie Delite 6-inch',brand:'subway',brandLabel:'Subway',kcal:200,p:8,c:40,f:2},
+  {name:'Chicken Teriyaki 6-inch',brand:'subway',brandLabel:'Subway',kcal:370,p:25,c:53,f:5},
+  {name:'Meatball Marinara 6-inch',brand:'subway',brandLabel:'Subway',kcal:480,p:22,c:58,f:17},
+  {name:'Steak & Cheese 6-inch',brand:'subway',brandLabel:'Subway',kcal:380,p:26,c:41,f:11},
+  {name:'BLT 6-inch',brand:'subway',brandLabel:'Subway',kcal:310,p:14,c:41,f:11},
+  {name:'Footlong Turkey Breast',brand:'subway',brandLabel:'Subway',kcal:560,p:38,c:82,f:8},
+  {name:'Cookies (chocolate chip)',brand:'subway',brandLabel:'Subway',kcal:220,p:2,c:30,f:10},
+  // KFC
+  {name:'Original Recipe Chicken (thigh)',brand:'kfc',brandLabel:'KFC',kcal:280,p:18,c:10,f:18},
+  {name:'Original Recipe Chicken (breast)',brand:'kfc',brandLabel:'KFC',kcal:390,p:39,c:11,f:21},
+  {name:'Extra Crispy Chicken (breast)',brand:'kfc',brandLabel:'KFC',kcal:490,p:37,c:17,f:30},
+  {name:'Chicken Sandwich (classic)',brand:'kfc',brandLabel:'KFC',kcal:650,p:28,c:52,f:36},
+  {name:'Popcorn Nuggets (kids)',brand:'kfc',brandLabel:'KFC',kcal:260,p:15,c:17,f:14},
+  {name:'Mac & Cheese (individual)',brand:'kfc',brandLabel:'KFC',kcal:180,p:7,c:27,f:5},
+  {name:'Coleslaw (individual)',brand:'kfc',brandLabel:'KFC',kcal:170,p:1,c:22,f:9},
+  {name:'Mashed Potato & Gravy',brand:'kfc',brandLabel:'KFC',kcal:130,p:3,c:20,f:4},
+  {name:'Famous Bowl',brand:'kfc',brandLabel:'KFC',kcal:710,p:28,c:80,f:31},
+  {name:'Biscuit',brand:'kfc',brandLabel:'KFC',kcal:180,p:4,c:21,f:9},
+  // TACO BELL
+  {name:'Crunchy Taco',brand:'tacobell',brandLabel:'Taco Bell',kcal:170,p:8,c:13,f:9},
+  {name:'Soft Taco (beef)',brand:'tacobell',brandLabel:'Taco Bell',kcal:180,p:9,c:18,f:8},
+  {name:'Burrito Supreme (beef)',brand:'tacobell',brandLabel:'Taco Bell',kcal:390,p:16,c:51,f:13},
+  {name:'Chalupa Supreme',brand:'tacobell',brandLabel:'Taco Bell',kcal:370,p:14,c:32,f:20},
+  {name:'Nachos BellGrande',brand:'tacobell',brandLabel:'Taco Bell',kcal:770,p:21,c:79,f:41},
+  {name:'Quesadilla (chicken)',brand:'tacobell',brandLabel:'Taco Bell',kcal:470,p:26,c:39,f:22},
+  {name:'Mexican Pizza',brand:'tacobell',brandLabel:'Taco Bell',kcal:540,p:20,c:49,f:28},
+  {name:'Cinnamon Twists',brand:'tacobell',brandLabel:'Taco Bell',kcal:170,p:1,c:26,f:7},
+  {name:'Beefy 5-Layer Burrito',brand:'tacobell',brandLabel:'Taco Bell',kcal:490,p:19,c:61,f:18},
+  {name:'Cheesy Bean & Rice Burrito',brand:'tacobell',brandLabel:'Taco Bell',kcal:420,p:12,c:57,f:15},
+  // STARBUCKS
+  {name:'Caffe Latte (grande, whole milk)',brand:'starbucks',brandLabel:'Starbucks',kcal:220,p:12,c:18,f:9},
+  {name:'Caramel Macchiato (grande)',brand:'starbucks',brandLabel:'Starbucks',kcal:250,p:10,c:34,f:7},
+  {name:'Frappuccino (mocha, grande)',brand:'starbucks',brandLabel:'Starbucks',kcal:420,p:6,c:61,f:16},
+  {name:'Cold Brew (grande, black)',brand:'starbucks',brandLabel:'Starbucks',kcal:5,p:0,c:0,f:0},
+  {name:'Vanilla Latte (grande)',brand:'starbucks',brandLabel:'Starbucks',kcal:250,p:13,c:35,f:6},
+  {name:'Pumpkin Spice Latte (grande)',brand:'starbucks',brandLabel:'Starbucks',kcal:380,p:14,c:52,f:14},
+  {name:'Cheese Croissant',brand:'starbucks',brandLabel:'Starbucks',kcal:320,p:13,c:29,f:17},
+  {name:'Chocolate Chip Cookie',brand:'starbucks',brandLabel:'Starbucks',kcal:350,p:4,c:47,f:17},
+  {name:'Bacon & Egg Sandwich',brand:'starbucks',brandLabel:'Starbucks',kcal:370,p:19,c:37,f:15},
+  {name:'Banana Bread',brand:'starbucks',brandLabel:'Starbucks',kcal:410,p:6,c:62,f:16},
+  // PIZZA
+  {name:'Cheese pizza slice (12")',brand:'pizza',brandLabel:'Pizza Hut',kcal:285,p:12,c:33,f:11},
+  {name:'Pepperoni pizza slice (12")',brand:'pizza',brandLabel:'Pizza Hut',kcal:340,p:15,c:33,f:15},
+  {name:'Veggie pizza slice (12")',brand:'pizza',brandLabel:'Pizza Hut',kcal:260,p:11,c:33,f:9},
+  {name:'Stuffed crust slice',brand:'pizza',brandLabel:'Pizza Hut',kcal:370,p:16,c:40,f:15},
+  {name:'BBQ Chicken pizza slice',brand:'pizza',brandLabel:'Pizza Hut',kcal:300,p:16,c:36,f:10},
+  {name:'Pan pizza slice (cheese)',brand:'pizza',brandLabel:'Pizza Hut',kcal:340,p:13,c:36,f:14},
+  {name:'Garlic bread (2 pieces)',brand:'pizza',brandLabel:'Pizza Hut',kcal:200,p:4,c:26,f:9},
+  {name:'Breadsticks (2 pieces)',brand:'pizza',brandLabel:'Pizza Hut',kcal:170,p:5,c:28,f:4},
+  {name:'Chicken wings (4 pieces)',brand:'pizza',brandLabel:'Pizza Hut',kcal:240,p:22,c:3,f:15},
+  {name:'Chocolate brownie',brand:'pizza',brandLabel:'Pizza Hut',kcal:370,p:4,c:54,f:16},
+];
 
-    <a href="#fastfood-db" style="display:flex;align-items:center;gap:10px;flex:1;min-width:160px;max-width:220px;background:rgba(0,128,0,.08);border-radius:16px;padding:16px;text-decoration:none;border:1px solid rgba(0,128,0,.15)">
-      <span style="font-size:24px">🥙</span>
-      <span>
-        <span style="font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:700;color:#0d2b35;display:block">Subway</span>
-        <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#0d2b35;opacity:.55">10 items · 200–560 kcal</span>
-      </span>
-    </a>
+var currentFilter = 'all';
 
-    <a href="#fastfood-db" style="display:flex;align-items:center;gap:10px;flex:1;min-width:160px;max-width:220px;background:rgba(231,0,0,.06);border-radius:16px;padding:16px;text-decoration:none;border:1px solid rgba(231,0,0,.12)">
-      <span style="font-size:24px">🍗</span>
-      <span>
-        <span style="font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:700;color:#0d2b35;display:block">KFC</span>
-        <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#0d2b35;opacity:.55">10 items · 130–710 kcal</span>
-      </span>
-    </a>
+function render(list){
+  var el=document.getElementById('food-list');
+  var nr=document.getElementById('no-results');
+  if(!list.length){el.innerHTML='';nr.classList.add('show');document.getElementById('count').textContent=0;return;}
+  nr.classList.remove('show');
+  document.getElementById('count').textContent=list.length;
+  el.innerHTML=list.map(function(f){
+    return '<div class="food-row" data-brand="'+f.brand+'">'+
+      '<div class="food-info"><span class="food-name">'+f.name+'</span><span class="food-brand brand-'+f.brand+'">'+f.brandLabel+'</span></div>'+
+      '<div class="td kcal '+kcalClass(f.kcal)+'">'+f.kcal+'</div>'+
+      '<div class="td protein">'+f.p+'g</div>'+
+      '<div class="td carbs">'+f.c+'g</div>'+
+      '<div class="td fat">'+f.f+'g</div>'+
+    '</div>';
+  }).join('');
+}
 
-    <a href="#fastfood-db" style="display:flex;align-items:center;gap:10px;flex:1;min-width:160px;max-width:220px;background:rgba(107,53,149,.08);border-radius:16px;padding:16px;text-decoration:none;border:1px solid rgba(107,53,149,.15)">
-      <span style="font-size:24px">🌮</span>
-      <span>
-        <span style="font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:700;color:#0d2b35;display:block">Taco Bell</span>
-        <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#0d2b35;opacity:.55">10 items · 170–770 kcal</span>
-      </span>
-    </a>
+function filterFoods(){
+  var q=document.getElementById('search').value.toLowerCase().trim();
+  var filtered=foods.filter(function(f){
+    var matchBrand=currentFilter==='all'||f.brand===currentFilter;
+    var matchQ=!q||f.name.toLowerCase().includes(q)||f.brandLabel.toLowerCase().includes(q);
+    return matchBrand&&matchQ;
+  });
+  render(filtered);
+}
 
-    <a href="#fastfood-db" style="display:flex;align-items:center;gap:10px;flex:1;min-width:160px;max-width:220px;background:rgba(0,112,74,.08);border-radius:16px;padding:16px;text-decoration:none;border:1px solid rgba(0,112,74,.15)">
-      <span style="font-size:24px">☕</span>
-      <span>
-        <span style="font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:700;color:#0d2b35;display:block">Starbucks</span>
-        <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#0d2b35;opacity:.55">10 items · 5–420 kcal</span>
-      </span>
-    </a>
+function setFilter(cat,btn){
+  currentFilter=cat;
+  document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  filterFoods();
+}
 
-  </div>
-</div>
+render(foods);
 
-<!-- ── MOST SEARCHED FAST FOOD ── -->
-<div id="fastfood-db" style="max-width:1100px;margin:0 auto;padding:0 40px 56px">
-  <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:#0d2b35;margin:0 0 8px;text-align:center">Most searched fast food calories</h2>
-  <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:#0d2b35;opacity:.55;text-align:center;margin:0 0 22px;line-height:1.6">Quick reference for the most commonly searched fast food items</p>
-
-  <div style="display:flex;flex-wrap:wrap;gap:12px">
-
-    <div style="flex:1;min-width:200px;background:rgba(165,42,42,.07);border-radius:18px;padding:20px;border:1px solid rgba(165,42,42,.12)">
-      <div style="font-size:20px;margin-bottom:8px">🌯 Chipotle Burrito</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:700;color:#0d2b35;line-height:1;margin-bottom:4px">~800 kcal</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:#0d2b35;opacity:.55;margin-bottom:10px">chicken · varies by toppings</div>
-      <div style="display:flex;gap:8px;font-size:11px;flex-wrap:wrap">
-        <span style="color:#1a6b45;font-weight:600">51g protein</span>
-        <span style="color:#5B3DB8;font-weight:600">81g carbs</span>
-        <span style="color:#B84A2A;font-weight:600">22g fat</span>
-      </div>
-    </div>
-
-    <div style="flex:1;min-width:200px;background:rgba(255,188,0,.08);border-radius:18px;padding:20px;border:1px solid rgba(255,188,0,.18)">
-      <div style="font-size:20px;margin-bottom:8px">🍔 Big Mac</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:700;color:#0d2b35;line-height:1;margin-bottom:4px">563 kcal</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:#0d2b35;opacity:.55;margin-bottom:10px">McDonald's · 1 burger</div>
-      <div style="display:flex;gap:8px;font-size:11px;flex-wrap:wrap">
-        <span style="color:#1a6b45;font-weight:600">26g protein</span>
-        <span style="color:#5B3DB8;font-weight:600">45g carbs</span>
-        <span style="color:#B84A2A;font-weight:600">32g fat</span>
-      </div>
-    </div>
-
-    <div style="flex:1;min-width:200px;background:rgba(0,128,0,.06);border-radius:18px;padding:20px;border:1px solid rgba(0,128,0,.12)">
-      <div style="font-size:20px;margin-bottom:8px">🥙 Subway Turkey 6-inch</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:700;color:#0d2b35;line-height:1;margin-bottom:4px">280 kcal</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:#0d2b35;opacity:.55;margin-bottom:10px">on 9-grain wheat bread</div>
-      <div style="display:flex;gap:8px;font-size:11px;flex-wrap:wrap">
-        <span style="color:#1a6b45;font-weight:600">19g protein</span>
-        <span style="color:#5B3DB8;font-weight:600">41g carbs</span>
-        <span style="color:#B84A2A;font-weight:600">4g fat</span>
-      </div>
-    </div>
-
-    <div style="flex:1;min-width:200px;background:rgba(231,0,0,.05);border-radius:18px;padding:20px;border:1px solid rgba(231,0,0,.1)">
-      <div style="font-size:20px;margin-bottom:8px">🍗 KFC Original Breast</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:700;color:#0d2b35;line-height:1;margin-bottom:4px">390 kcal</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:#0d2b35;opacity:.55;margin-bottom:10px">1 piece · original recipe</div>
-      <div style="display:flex;gap:8px;font-size:11px;flex-wrap:wrap">
-        <span style="color:#1a6b45;font-weight:600">39g protein</span>
-        <span style="color:#5B3DB8;font-weight:600">11g carbs</span>
-        <span style="color:#B84A2A;font-weight:600">21g fat</span>
-      </div>
-    </div>
-
-    <div style="flex:1;min-width:200px;background:rgba(255,188,0,.08);border-radius:18px;padding:20px;border:1px solid rgba(255,188,0,.18)">
-      <div style="font-size:20px;margin-bottom:8px">🍟 McDonald's Large Fries</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:700;color:#0d2b35;line-height:1;margin-bottom:4px">490 kcal</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:#0d2b35;opacity:.55;margin-bottom:10px">large size · 154g</div>
-      <div style="display:flex;gap:8px;font-size:11px;flex-wrap:wrap">
-        <span style="color:#1a6b45;font-weight:600">7g protein</span>
-        <span style="color:#5B3DB8;font-weight:600">65g carbs</span>
-        <span style="color:#B84A2A;font-weight:600">23g fat</span>
-      </div>
-    </div>
-
-    <div style="flex:1;min-width:200px;background:rgba(0,112,74,.06);border-radius:18px;padding:20px;border:1px solid rgba(0,112,74,.12)">
-      <div style="font-size:20px;margin-bottom:8px">☕ Starbucks Frappuccino</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:700;color:#0d2b35;line-height:1;margin-bottom:4px">420 kcal</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:#0d2b35;opacity:.55;margin-bottom:10px">mocha · grande (16oz)</div>
-      <div style="display:flex;gap:8px;font-size:11px;flex-wrap:wrap">
-        <span style="color:#1a6b45;font-weight:600">6g protein</span>
-        <span style="color:#5B3DB8;font-weight:600">61g carbs</span>
-        <span style="color:#B84A2A;font-weight:600">16g fat</span>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ── TIPS FOR EATING LOWER CALORIE FAST FOOD ── -->
-<div style="max-width:1100px;margin:0 auto;padding:0 40px 56px">
-  <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:#0d2b35;margin:0 0 22px;text-align:center">How to reduce calories when eating fast food</h2>
-  <div style="display:flex;flex-wrap:wrap;gap:14px">
-
-    <div style="flex:1;min-width:240px;background:rgba(210,240,220,.7);border-radius:20px;padding:24px;border:1px solid rgba(82,183,136,.25)">
-      <div style="font-size:22px;margin-bottom:10px">🥗</div>
-      <h3 style="font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:700;color:#0d2b35;margin:0 0 8px">Choose bowls over burritos</h3>
-      <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:#0d2b35;opacity:.65;line-height:1.65;margin:0">At Chipotle, a burrito bowl (525 kcal) has 275 fewer calories than a burrito (800 kcal) — purely from removing the tortilla. Same filling, 34% fewer calories.</p>
-    </div>
-
-    <div style="flex:1;min-width:240px;background:rgba(255,255,255,.5);border-radius:20px;padding:24px;border:1px solid rgba(13,43,53,.08)">
-      <div style="font-size:22px;margin-bottom:10px">🥤</div>
-      <h3 style="font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:700;color:#0d2b35;margin:0 0 8px">Skip the sugary drinks</h3>
-      <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:#0d2b35;opacity:.65;line-height:1.65;margin:0">A large Coke adds 310 calories to any meal — almost the same as a small burger. Switching to water saves those calories without any sacrifice in food satisfaction.</p>
-    </div>
-
-    <div style="flex:1;min-width:240px;background:rgba(107,79,187,.1);border-radius:20px;padding:24px;border:1px solid rgba(107,79,187,.18)">
-      <div style="font-size:22px;margin-bottom:10px">📱</div>
-      <h3 style="font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:700;color:#0d2b35;margin:0 0 8px">Track before you order, not after</h3>
-      <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:#0d2b35;opacity:.65;line-height:1.65;margin:0">Check the calories before ordering — not after eating. Research shows people consistently underestimate fast food calories by 30–40%. Snap your meal with Tou Calo to get accurate numbers instantly.</p>
-    </div>
-
-  </div>
-</div>
-
-<!-- ── FAQ ── -->
-<div style="max-width:1100px;margin:0 auto;padding:0 40px 56px">
-  <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:#0d2b35;margin:0 0 24px;text-align:center">Frequently asked questions</h2>
-
-  <div style="border-bottom:1px solid rgba(13,43,53,.1);padding:20px 0">
-    <h3 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:600;color:#0d2b35;margin:0 0 10px">How many calories are in a Chipotle burrito?</h3>
-    <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:#0d2b35;opacity:.62;line-height:1.7;margin:0">A typical Chipotle chicken burrito contains around 800–1,000 calories depending on your toppings. The tortilla alone adds approximately 320 calories. Switching to a burrito bowl (no tortilla) saves 275 calories — a burrito bowl with chicken averages around 525 calories and provides the same amount of protein.</p>
-  </div>
-
-  <div style="border-bottom:1px solid rgba(13,43,53,.1);padding:20px 0">
-    <h3 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:600;color:#0d2b35;margin:0 0 10px">What is the lowest calorie item at McDonald's?</h3>
-    <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:#0d2b35;opacity:.62;line-height:1.7;margin:0">The Caesar Salad without dressing is one of the lowest calorie options at McDonald's at just 90 calories. Among sandwiches, the McDouble at 400 calories offers the best protein-to-calorie ratio. Small French Fries at 230 calories are significantly better than large fries at 490 calories.</p>
-  </div>
-
-  <div style="border-bottom:1px solid rgba(13,43,53,.1);padding:20px 0">
-    <h3 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:600;color:#0d2b35;margin:0 0 10px">What is the lowest calorie Subway sandwich?</h3>
-    <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:#0d2b35;opacity:.62;line-height:1.7;margin:0">The Veggie Delite 6-inch is Subway's lowest calorie sandwich at just 200 calories. Among meat options, the Turkey Breast 6-inch at 280 calories is the best choice. Switching from white to 9-grain wheat bread saves around 20 calories and adds more fiber and nutrients.</p>
-  </div>
-
-  <div style="border-bottom:1px solid rgba(13,43,53,.1);padding:20px 0">
-    <h3 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:600;color:#0d2b35;margin:0 0 10px">How many calories are in a KFC bucket?</h3>
-    <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:#0d2b35;opacity:.62;line-height:1.7;margin:0">A KFC Original Recipe chicken breast contains 390 calories per piece. A thigh has 280 calories. Per 100g, KFC Original Recipe chicken contains approximately 295 calories. The Extra Crispy version adds about 25% more calories due to the thicker batter coating.</p>
-  </div>
-
-  <div style="padding:20px 0 0">
-    <h3 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:600;color:#0d2b35;margin:0 0 10px">Can I eat fast food and still lose weight?</h3>
-    <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:#0d2b35;opacity:.62;line-height:1.7;margin:0">Yes — weight loss depends on your total daily calorie intake, not on which specific foods you eat. You can eat fast food and still lose weight as long as you stay within your daily calorie deficit. The key is knowing exactly how many calories are in what you're eating, which is why using a calorie tracker like Tou Calo is so effective — snap your meal and get accurate nutrition data in 3 seconds.</p>
-  </div>
-</div>
-
-<!-- ── RELATED ── -->
-<div style="max-width:1100px;margin:0 auto;padding:0 40px 56px">
-  <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:clamp(20px,3vw,28px);font-weight:700;color:#0d2b35;margin:0 0 18px;text-align:center">Related calorie tools</h2>
-  <div style="display:flex;flex-wrap:wrap;gap:12px">
-    <a href="../tdee/" style="flex:1;min-width:180px;background:rgba(107,79,187,.1);border-radius:18px;padding:18px;text-decoration:none;border:1px solid rgba(107,79,187,.18)">
-      <div style="font-size:20px;margin-bottom:8px">⚡</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:700;color:#0d2b35;margin-bottom:4px">TDEE Calculator</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:#0d2b35;opacity:.6;line-height:1.45">How many calories should you eat each day for your body goal?</div>
-    </a>
-    <a href="../bmr/" style="flex:1;min-width:180px;background:rgba(255,255,255,.5);border-radius:18px;padding:18px;text-decoration:none;border:1px solid rgba(13,43,53,.08)">
-      <div style="font-size:20px;margin-bottom:8px">🔥</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:700;color:#0d2b35;margin-bottom:4px">BMR Calculator</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:#0d2b35;opacity:.6;line-height:1.45">Calories your body burns at complete rest — your baseline</div>
-    </a>
-    <a href="../deficit/" style="flex:1;min-width:180px;background:rgba(210,240,220,.7);border-radius:18px;padding:18px;text-decoration:none;border:1px solid rgba(82,183,136,.25)">
-      <div style="font-size:20px;margin-bottom:8px">📉</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:700;color:#0d2b35;margin-bottom:4px">Calorie Deficit Calculator</div>
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:#0d2b35;opacity:.6;line-height:1.45">Find your daily calorie target to lose weight at your chosen pace</div>
-    </a>
-  </div>
-</div>
-
-<!-- ── CTA ── -->
-<div style="max-width:1100px;margin:0 auto;padding:0 40px 72px">
-  <div style="background:rgba(13,43,53,.9);border-radius:26px;padding:48px 44px;display:flex;flex-wrap:wrap;align-items:center;gap:32px;justify-content:space-between">
-    <div style="flex:1;min-width:280px">
-      <div style="display:inline-block;background:rgba(82,183,136,.2);color:#52B788;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;font-weight:700;padding:5px 14px;border-radius:100px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:16px">Free on App Store</div>
-      <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:clamp(26px,4vw,40px);font-weight:700;line-height:1.1;color:#fff;margin:0 0 14px">
-        Ate fast food today?<br><em style="font-style:italic;color:#52B788">Log it in 3 seconds.</em>
-      </h2>
-      <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;color:rgba(255,255,255,.52);line-height:1.68;margin:0;max-width:480px">
-        Snap a photo of your meal and Tou Calo's AI identifies the food and logs the full nutrition automatically — no manual searching, no guessing, no database scrolling.
-      </p>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;flex-shrink:0">
-      <a href="https://apps.apple.com/us/app/tou-calo-ai-calorie-counter/id6698870692" style="display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:16px 24px;text-decoration:none">
-        <span style="font-size:26px">🍎</span>
-        <span>
-          <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:rgba(255,255,255,.42);display:block;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Download on the</span>
-          <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:18px;font-weight:700;color:#fff;display:block">App Store</span>
-        </span>
-      </a>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="font-size:16px;color:#FFB800;letter-spacing:2px">★★★★★</div>
-        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;color:rgba(255,255,255,.38)">4.5 · 126 reviews</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── FAQ SCHEMA ── -->
-<div style="display:none" itemscope itemtype="https://schema.org/FAQPage">
-  <div itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
-    <span itemprop="name">How many calories are in a Chipotle burrito?</span>
-    <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
-      <span itemprop="text">A typical Chipotle chicken burrito contains around 800–1,000 calories. Switching to a burrito bowl saves around 275 calories by removing the tortilla.</span>
-    </div>
-  </div>
-  <div itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
-    <span itemprop="name">What is the lowest calorie item at McDonald's?</span>
-    <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
-      <span itemprop="text">The Caesar Salad without dressing is 90 calories. Among sandwiches, the McDouble at 400 calories offers the best protein-to-calorie ratio.</span>
-    </div>
-  </div>
-  <div itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
-    <span itemprop="name">Can I eat fast food and still lose weight?</span>
-    <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
-      <span itemprop="text">Yes. Weight loss depends on total daily calorie intake, not specific foods. You can eat fast food and lose weight as long as you stay within your daily calorie deficit.</span>
-    </div>
-  </div>
-</div>
-
+function sendHeight(){
+  try{window.parent.postMessage({type:'resize',height:document.body.scrollHeight+40},'*');}catch(e){}
+}
+window.addEventListener('load',sendHeight);
+document.getElementById('search').addEventListener('input',function(){setTimeout(sendHeight,100);});
+</script>
 </body>
 </html>
