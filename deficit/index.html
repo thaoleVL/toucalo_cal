@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calorie Deficit Calculator — Tou Calo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,800;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:linear-gradient(160deg,#c8bbf0 0%,#d4c5f5 30%,#e0ceee 60%,#edd5e8 100%);min-height:100vh;color:#0d2b35;padding:28px 20px 40px}
+.wrap{max-width:680px;margin:0 auto}
+.top-logo{text-align:center;margin-bottom:20px}
+.top-logo span{font-size:15px;font-weight:600;color:#0d2b35;letter-spacing:-0.01em}
+.top-logo span em{font-style:normal;color:#6B4FBB}
+h2{font-family:'Fraunces',serif;font-size:clamp(24px,4vw,34px);font-weight:900;line-height:1.1;letter-spacing:-0.025em;color:#0d2b35;text-align:center;margin-bottom:5px}
+h2 em{font-style:italic;color:#6B4FBB}
+.subtitle{font-size:13px;color:#0d2b35;opacity:.55;text-align:center;margin-bottom:20px;line-height:1.5;font-weight:300}
+
+.unit-toggle{display:flex;background:rgba(255,255,255,.5);border-radius:100px;padding:3px;margin-bottom:20px;border:1px solid rgba(255,255,255,.8);width:fit-content;margin-left:auto;margin-right:auto}
+.utbtn{padding:6px 18px;border-radius:100px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;background:transparent;color:#0d2b35;opacity:.5;transition:all .18s}
+.utbtn.on{background:#0d2b35;color:#fff;opacity:1}
+
+.card{background:rgba(255,255,255,.58);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:22px;padding:24px;border:1px solid rgba(255,255,255,.82);margin-bottom:12px}
+.card-title{font-family:'Fraunces',serif;font-size:16px;font-weight:800;color:#0d2b35;margin-bottom:18px;letter-spacing:-0.02em}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.full{grid-column:1/-1}
+label{font-size:11px;font-weight:600;color:#0d2b35;opacity:.55;letter-spacing:.07em;text-transform:uppercase}
+.input-group{display:flex;gap:6px}
+input[type=number]{background:rgba(255,255,255,.78);border:1.5px solid rgba(13,43,53,.12);border-radius:10px;padding:10px 12px;font-size:15px;color:#0d2b35;font-family:'DM Sans',sans-serif;outline:none;width:100%;-moz-appearance:textfield;transition:border-color .2s}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]:focus{border-color:#6B4FBB;background:#fff}
+.unit-suffix{display:flex;align-items:center;justify-content:center;background:rgba(13,43,53,.06);border:1.5px solid rgba(13,43,53,.08);border-radius:10px;padding:0 12px;font-size:12px;font-weight:600;color:#0d2b35;opacity:.5;white-space:nowrap;flex-shrink:0;height:42px}
+.ft-wrap{display:flex;gap:6px;width:100%}
+.ft-wrap input{flex:1}
+.ft-label{font-size:11px;color:#0d2b35;opacity:.4;align-self:center;flex-shrink:0}
+.grow{display:flex;gap:8px}
+.gbtn{flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid rgba(13,43,53,.12);background:rgba(255,255,255,.6);font-size:14px;font-weight:500;color:#0d2b35;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s}
+.gbtn.on{background:#0d2b35;color:#fff;border-color:#0d2b35}
+.swrap{position:relative}
+.swrap::after{content:'↓';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;pointer-events:none;color:#0d2b35;opacity:.4}
+select{background:rgba(255,255,255,.78);border:1.5px solid rgba(13,43,53,.12);border-radius:10px;padding:10px 12px;font-size:13px;color:#0d2b35;font-family:'DM Sans',sans-serif;outline:none;width:100%;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .2s}
+select:focus{border-color:#6B4FBB}
+.ggrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ggoal{padding:9px 6px;border-radius:10px;border:1.5px solid rgba(13,43,53,.12);background:rgba(255,255,255,.6);font-size:12px;font-weight:500;color:#0d2b35;cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif;line-height:1.3;transition:all .18s}
+.ggoal.on{border-color:#6B4FBB;background:rgba(107,79,187,.12);color:#5B3DB8}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.rbtn{padding:9px 4px;border-radius:10px;border:1.5px solid rgba(13,43,53,.12);background:rgba(255,255,255,.6);font-size:11px;font-weight:500;color:#0d2b35;cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif;line-height:1.35;transition:all .18s}
+.rbtn.on{border-color:#E76F51;background:rgba(231,111,81,.1);color:#B84A2A}
+.rb-rate{font-family:'Fraunces',serif;font-size:14px;font-weight:800;display:block;margin-bottom:2px}
+.cbtn{width:100%;margin-top:16px;padding:13px;border-radius:100px;background:#0d2b35;color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.cbtn:hover{background:#1a4a5a;transform:translateY(-1px)}
+.error{background:rgba(231,111,81,.12);border:1px solid rgba(231,111,81,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#8b3a1f;margin-top:10px;display:none;line-height:1.5}
+.error.show{display:block}
+
+/* PROMO — always rendered, hidden until calc */
+.promo-card{background:linear-gradient(135deg,#0d2b35 0%,#1a4a5a 60%,#2D6A4F 100%);border-radius:22px;padding:26px;margin-bottom:12px;display:none;position:relative;overflow:hidden}
+.promo-card.show{display:block;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.promo-logo{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.promo-logo-dot{width:30px;height:30px;border-radius:9px;background:#52B788;display:flex;align-items:center;justify-content:center;font-size:13px}
+.promo-logo-name{font-size:14px;font-weight:600;color:#fff}
+.promo-logo-name em{font-style:normal;color:#52B788}
+.promo-headline{font-family:'Fraunces',serif;font-size:clamp(17px,3vw,22px);font-weight:900;color:#fff;line-height:1.2;margin-bottom:10px;letter-spacing:-0.02em}
+.promo-headline em{font-style:italic;color:#52B788}
+.promo-body{font-size:13px;color:rgba(255,255,255,.62);line-height:1.65;margin-bottom:16px;font-weight:300}
+.promo-features{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.promo-feat{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.78);line-height:1.4}
+.promo-feat-icon{width:20px;height:20px;min-width:20px;border-radius:6px;background:rgba(82,183,136,.2);display:flex;align-items:center;justify-content:center;font-size:10px}
+.promo-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.promo-download{display:inline-flex;align-items:center;gap:8px;background:#52B788;border-radius:100px;padding:10px 18px;text-decoration:none;font-size:13px;font-weight:600;color:#fff;transition:opacity .2s;flex-shrink:0}
+.promo-download:hover{opacity:.85}
+.promo-skip{background:none;border:none;font-size:12px;color:rgba(255,255,255,.42);cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:2px;transition:color .2s;padding:0}
+.promo-skip:hover{color:rgba(255,255,255,.68)}
+
+/* RESULT — always rendered, dimmed until shown */
+.rcard{background:#0d2b35;border-radius:22px;padding:26px;opacity:.45;transition:opacity .5s ease;display:none}
+.rcard.show{display:block}
+.rcard.active{opacity:1}
+.rcard.active .r-num{animation:pop .4s ease}
+@keyframes pop{from{transform:scale(.85);opacity:.3}to{transform:scale(1);opacity:1}}
+.rtop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.r-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:.07em;text-transform:uppercase}
+.r-sub{font-size:11px;color:rgba(255,255,255,.28);margin-top:3px}
+.r-num-wrap{text-align:right}
+.r-num{font-family:'Fraunces',serif;font-size:50px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.03em}
+.r-unit{font-size:12px;color:rgba(255,255,255,.38);margin-top:3px}
+.def-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.dc{border-radius:13px;padding:12px;text-align:center}
+.dc-d{background:rgba(82,183,136,.14);border:1px solid rgba(82,183,136,.22)}
+.dc-t{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09)}
+.dc-w{background:rgba(244,162,97,.14);border:1px solid rgba(244,162,97,.2)}
+.dc-lbl{font-size:10px;color:rgba(255,255,255,.38);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.dc-n{font-family:'Fraunces',serif;font-size:20px;font-weight:800;line-height:1;margin-bottom:2px}
+.dc-d .dc-n{color:#52B788}
+.dc-t .dc-n{color:#fff}
+.dc-w .dc-n{color:#F4A261}
+.dc-s{font-size:10px;color:rgba(255,255,255,.32)}
+.timeline{background:rgba(255,255,255,.05);border-radius:13px;padding:14px;margin-bottom:14px;border:1px solid rgba(255,255,255,.07)}
+.tl-title{font-size:10px;font-weight:600;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.tl-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid rgba(255,255,255,.05)}
+.tl-row:last-child{border-bottom:none}
+.tl-period{font-size:12px;color:rgba(255,255,255,.48)}
+.tl-loss{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:#52B788}
+.mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mc{background:rgba(255,255,255,.05);border-radius:12px;padding:11px;text-align:center;border:1px solid rgba(255,255,255,.07)}
+.mc-l{font-size:10px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.mc-v{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:#fff;line-height:1;margin-bottom:2px}
+.mc-u{font-size:10px;color:rgba(255,255,255,.3)}
+.r-note{font-size:11px;color:rgba(255,255,255,.32);text-align:center;line-height:1.6;margin-bottom:12px}
+.reset-row{text-align:center}
+.reset-btn{background:none;border:none;font-size:12px;color:rgba(255,255,255,.32);cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:2px}
+.foot{text-align:center;margin-top:16px;font-size:11px;color:rgba(13,43,53,.4);line-height:1.6}
+
+@media(max-width:480px){
+  .fgrid{grid-template-columns:1fr}
+  .def-cards{grid-template-columns:1fr}
+  .mrow{grid-template-columns:1fr 1fr}
+  .rtop{flex-direction:column}
+  .r-num-wrap{text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-logo"><span>tou <em>calo</em></span></div>
+  <h2>Your calorie deficit,<br><em>calculated.</em></h2>
+  <p class="subtitle">Find exactly how much to eat each day to reach your goal weight.</p>
+
+  <div class="unit-toggle">
+    <button class="utbtn on" id="ut-metric" onclick="setUnit('metric')">Metric (kg / cm)</button>
+    <button class="utbtn" id="ut-imperial" onclick="setUnit('imperial')">Imperial (lbs / ft)</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Your details</div>
+    <div class="fgrid">
+
+      <div class="field full">
+        <label>Gender</label>
+        <div class="grow">
+          <button class="gbtn on" id="bm" onclick="setG('male')">Male</button>
+          <button class="gbtn" id="bf" onclick="setG('female')">Female</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Age</label>
+        <div class="input-group">
+          <input type="number" id="age" placeholder="25" min="10" max="100">
+          <span class="unit-suffix">yrs</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label id="wt-label">Current weight (kg)</label>
+        <div class="input-group">
+          <input type="number" id="wt" placeholder="70" min="30" max="660">
+          <span class="unit-suffix" id="wt-unit">kg</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label id="gw-label">Goal weight (kg)</label>
+        <div class="input-group">
+          <input type="number" id="gw" placeholder="65" min="30" max="660">
+          <span class="unit-suffix" id="gw-unit">kg</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label id="ht-label">Height (cm)</label>
+        <div id="ht-metric" class="input-group">
+          <input type="number" id="ht-cm" placeholder="170" min="100" max="250">
+          <span class="unit-suffix">cm</span>
+        </div>
+        <div id="ht-imperial" class="ft-wrap" style="display:none">
+          <input type="number" id="ht-ft" placeholder="5" min="3" max="8">
+          <span class="ft-label">ft</span>
+          <input type="number" id="ht-in" placeholder="11" min="0" max="11">
+          <span class="ft-label">in</span>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>Activity level</label>
+        <div class="swrap">
+          <select id="act">
+            <option value="1.2">Sedentary – little or no exercise</option>
+            <option value="1.375">Lightly active – light exercise 1–3 days/week</option>
+            <option value="1.55" selected>Moderately active – moderate exercise 3–5 days/week</option>
+            <option value="1.725">Very active – hard exercise 6–7 days/week</option>
+            <option value="1.9">Extra active – very hard exercise or physical job</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>Goal</label>
+        <div class="ggrid">
+          <button class="ggoal on" id="g-lose" onclick="setGoal('lose')">🔥 Lose weight</button>
+          <button class="ggoal" id="g-gain" onclick="setGoal('gain')">💪 Gain weight</button>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>Weekly rate</label>
+        <div class="rgrid">
+          <button class="rbtn on" id="r-slow" onclick="setRate('slow')">
+            <span class="rb-rate" id="rs-slow">−0.25 kg</span>Slow & easy
+          </button>
+          <button class="rbtn" id="r-mod" onclick="setRate('moderate')">
+            <span class="rb-rate" id="rs-mod">−0.5 kg</span>Moderate
+          </button>
+          <button class="rbtn" id="r-fast" onclick="setRate('fast')">
+            <span class="rb-rate" id="rs-fast">−0.75 kg</span>Aggressive
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <button class="cbtn" onclick="calc()">Calculate My Calorie Deficit →</button>
+    <div class="error" id="err">Please fill in all fields with valid values.</div>
+  </div>
+
+  <!-- PROMO (shown after calculate, before result) -->
+  <div class="promo-card" id="promo">
+    <div class="promo-logo">
+      <div class="promo-logo-dot">🍎</div>
+      <div class="promo-logo-name">tou <em>calo</em></div>
+    </div>
+    <div class="promo-headline">Track calories accurately.<br>Lose weight <em>more effectively.</em></div>
+    <div class="promo-body">
+      Tou Calo helps you track every meal against your deficit target — including calories burned from activity — so you always know exactly where you stand. No guessing, no manual logging.
+    </div>
+    <div class="promo-features">
+      <div class="promo-feat"><div class="promo-feat-icon">📸</div><span>Snap any meal — AI counts calories in 3 seconds, far more accurately than estimating</span></div>
+      <div class="promo-feat"><div class="promo-feat-icon">🔥</div><span>Track calories burned from exercise — see your real net deficit every day</span></div>
+      <div class="promo-feat"><div class="promo-feat-icon">📊</div><span>Daily progress dashboard — know if you're on track before the day ends</span></div>
+      <div class="promo-feat"><div class="promo-feat-icon">⚖️</div><span>Weight trend log — watch your progress move toward your goal weight over time</span></div>
+    </div>
+    <div class="promo-actions">
+      <a href="https://apps.apple.com/us/app/tou-calo-ai-calorie-counter/id6698870692" class="promo-download">🍎 Download Free on App Store</a>
+      <button class="promo-skip" onclick="showResult()">Skip, show my result →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="rcard" id="res">
+    <div class="rtop">
+      <div>
+        <div class="r-lbl">Daily calorie target</div>
+        <div class="r-sub" id="r-goal-label">To reach your goal weight</div>
+      </div>
+      <div class="r-num-wrap">
+        <div class="r-num" id="rn">—</div>
+        <div class="r-unit">kcal / day</div>
+      </div>
+    </div>
+
+    <div class="def-cards">
+      <div class="dc dc-d"><div class="dc-lbl">Daily deficit</div><div class="dc-n" id="d-def">—</div><div class="dc-s">kcal below TDEE</div></div>
+      <div class="dc dc-t"><div class="dc-lbl">Your TDEE</div><div class="dc-n" id="d-tdee">—</div><div class="dc-s">maintenance cals</div></div>
+      <div class="dc dc-w"><div class="dc-lbl">Weekly rate</div><div class="dc-n" id="d-week">—</div><div class="dc-s" id="d-week-unit">kg/week</div></div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-title">Estimated progress</div>
+      <div class="tl-row"><span class="tl-period">In 4 weeks</span><span class="tl-loss" id="tl-4w">—</span></div>
+      <div class="tl-row"><span class="tl-period">In 8 weeks</span><span class="tl-loss" id="tl-8w">—</span></div>
+      <div class="tl-row"><span class="tl-period">Reach goal weight</span><span class="tl-loss" id="tl-goal">—</span></div>
+    </div>
+
+    <div class="mrow">
+      <div class="mc"><div class="mc-l">Protein</div><div class="mc-v" id="mp">—</div><div class="mc-u">g/day</div></div>
+      <div class="mc"><div class="mc-l">Carbs</div><div class="mc-v" id="mcc">—</div><div class="mc-u">g/day</div></div>
+      <div class="mc"><div class="mc-l">Fat</div><div class="mc-v" id="mf">—</div><div class="mc-u">g/day</div></div>
+    </div>
+
+    <div class="r-note">High protein (2.2g/kg) helps preserve muscle while in a deficit · Track daily with Tou Calo</div>
+    <div class="reset-row"><button class="reset-btn" onclick="doReset()">← Recalculate</button></div>
+  </div>
+
+  <p class="foot">Formula: Mifflin-St Jeor · 1 kg fat ≈ 7,700 kcal · Results are estimates. Consult a professional for medical advice.</p>
+</div>
+
+<script>
+var g='male', goal='lose', rate='slow', unit='metric';
+var _kgPerWeek=0.25;
+
+function setUnit(u){
+  unit=u;
+  document.getElementById('ut-metric').classList.toggle('on',u==='metric');
+  document.getElementById('ut-imperial').classList.toggle('on',u==='imperial');
+  var isImp=u==='imperial';
+  document.getElementById('wt-label').textContent=isImp?'Current weight (lbs)':'Current weight (kg)';
+  document.getElementById('wt-unit').textContent=isImp?'lbs':'kg';
+  document.getElementById('wt').placeholder=isImp?'154':'70';
+  document.getElementById('gw-label').textContent=isImp?'Goal weight (lbs)':'Goal weight (kg)';
+  document.getElementById('gw-unit').textContent=isImp?'lbs':'kg';
+  document.getElementById('gw').placeholder=isImp?'143':'65';
+  document.getElementById('ht-label').textContent=isImp?'Height':'Height (cm)';
+  document.getElementById('ht-metric').style.display=isImp?'none':'flex';
+  document.getElementById('ht-imperial').style.display=isImp?'flex':'none';
+  updateRateLabels();
+}
+
+function setG(v){
+  g=v;
+  document.getElementById('bm').className='gbtn'+(v==='male'?' on':'');
+  document.getElementById('bf').className='gbtn'+(v==='female'?' on':'');
+}
+
+function setGoal(v){
+  goal=v;
+  document.getElementById('g-lose').className='ggoal'+(v==='lose'?' on':'');
+  document.getElementById('g-gain').className='ggoal'+(v==='gain'?' on':'');
+  updateRateLabels();
+}
+
+function setRate(v){
+  rate=v;
+  var ids={slow:'r-slow',moderate:'r-mod',fast:'r-fast'};
+  Object.keys(ids).forEach(function(x){
+    var el=document.getElementById(ids[x]);
+    if(el) el.classList.toggle('on',x===v);
+  });
+  _kgPerWeek=v==='slow'?0.25:v==='moderate'?0.5:0.75;
+}
+
+function updateRateLabels(){
+  var isImp=unit==='imperial';
+  var sign=goal==='lose'?'−':'+';
+  var rates=isImp?['0.55 lbs','1.1 lbs','1.65 lbs']:['0.25 kg','0.5 kg','0.75 kg'];
+  var rs=document.getElementById('rs-slow');
+  var rm=document.getElementById('rs-mod');
+  var rf=document.getElementById('rs-fast');
+  var dw=document.getElementById('d-week-unit');
+  if(rs) rs.textContent=sign+rates[0];
+  if(rm) rm.textContent=sign+rates[1];
+  if(rf) rf.textContent=sign+rates[2];
+  if(dw) dw.textContent=isImp?'lbs/week':'kg/week';
+}
+
+function toKg(v){ return unit==='imperial'?v*0.453592:v; }
+function fromKg(v){ return unit==='imperial'?+(v/0.453592).toFixed(1):v; }
+
+function getWeightKg(id){
+  var v=parseFloat(document.getElementById(id).value);
+  if(!v) return null;
+  return toKg(v);
+}
+
+function getHeightCm(){
+  if(unit==='metric'){
+    return parseFloat(document.getElementById('ht-cm').value)||null;
+  }
+  var ft=parseFloat(document.getElementById('ht-ft').value)||0;
+  var inch=parseFloat(document.getElementById('ht-in').value)||0;
+  if(!ft&&!inch) return null;
+  return (ft*30.48)+(inch*2.54);
+}
+
+function calc(){
+  var err=document.getElementById('err');
+  var a=parseFloat(document.getElementById('age').value);
+  var w=getWeightKg('wt');
+  var gw=getWeightKg('gw');
+  var h=getHeightCm();
+  var act=parseFloat(document.getElementById('act').value);
+
+  if(!a||!w||!h||!gw||a<10||a>100||w<30||w>300||h<100||h>250||w===gw){
+    err.classList.add('show');return;
+  }
+  err.classList.remove('show');
+
+  var bmr=g==='male'?(10*w+6.25*h-5*a+5):(10*w+6.25*h-5*a-161);
+  var tdee=Math.round(bmr*act);
+
+  var dailyDiff=Math.round(_kgPerWeek*7700/7);
+  var target=goal==='lose'?Math.max(tdee-dailyDiff,1200):tdee+dailyDiff;
+  var actualDiff=Math.abs(tdee-target);
+  var actualWeeklyKg=(actualDiff*7/7700);
+
+  // timeline
+  var diffKg=Math.abs(w-gw);
+  var weeksToGoal=Math.ceil(diffKg/actualWeeklyKg);
+
+  var pro=Math.round(w*2.2);
+  var fat=Math.round(target*.25/9);
+  var carb=Math.max(Math.round((target-pro*4-fat*9)/4),0);
+
+  document.getElementById('rn').textContent=target.toLocaleString();
+  document.getElementById('r-goal-label').textContent=goal==='lose'?('To lose '+fromKg(actualWeeklyKg)+(unit==='imperial'?' lbs':' kg')+'/week safely'):('To gain '+fromKg(actualWeeklyKg)+(unit==='imperial'?' lbs':' kg')+'/week');
+
+  var defLabel=(goal==='lose'?'−':'+')+actualDiff.toLocaleString()+' kcal';
+  document.getElementById('d-def').textContent=defLabel;
+  document.getElementById('d-tdee').textContent=tdee.toLocaleString()+' kcal';
+
+  var wkDisplay=fromKg(actualWeeklyKg)+(unit==='imperial'?' lbs':' kg');
+  document.getElementById('d-week').textContent=(goal==='lose'?'−':'+')+wkDisplay;
+
+  // timeline display
+  var w4=fromKg(actualWeeklyKg*4);
+  var w8=fromKg(actualWeeklyKg*8);
+  var wAfter4=fromKg(goal==='lose'?w-actualWeeklyKg*4:w+actualWeeklyKg*4);
+  var wAfter8=fromKg(goal==='lose'?w-actualWeeklyKg*8:w+actualWeeklyKg*8);
+  var u=unit==='imperial'?' lbs':' kg';
+  document.getElementById('tl-4w').textContent=(goal==='lose'?'−':'+')+(w4)+u+' → '+wAfter4+u;
+  document.getElementById('tl-8w').textContent=(goal==='lose'?'−':'+')+(w8)+u+' → '+wAfter8+u;
+  document.getElementById('tl-goal').textContent='~'+weeksToGoal+' weeks → '+fromKg(gw)+u;
+
+  document.getElementById('mp').textContent=pro;
+  document.getElementById('mcc').textContent=carb;
+  document.getElementById('mf').textContent=fat;
+
+  // show promo first
+  var promo=document.getElementById('promo');
+  promo.classList.remove('show');
+  void promo.offsetWidth;
+  promo.classList.add('show');
+  promo.scrollIntoView({behavior:'smooth',block:'nearest'});
+  sendHeight();
+}
+
+function showResult(){
+  document.getElementById('promo').style.display='none';
+  var r=document.getElementById('res');
+  r.classList.add('show');
+  setTimeout(function(){r.classList.add('active');},50);
+  r.scrollIntoView({behavior:'smooth',block:'nearest'});
+  sendHeight();
+}
+
+function doReset(){
+  document.getElementById('res').classList.remove('show','active');
+  document.getElementById('promo').classList.remove('show');
+  document.getElementById('promo').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  sendHeight();
+}
+
+function sendHeight(){
+  try{window.parent.postMessage({type:'resize',height:document.body.scrollHeight+40},'*');}catch(e){}
+}
+window.addEventListener('load',sendHeight);
+updateRateLabels();
+</script>
+</body>
+</html>

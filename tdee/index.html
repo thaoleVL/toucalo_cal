@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDEE Calculator — Tou Calo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,800;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:linear-gradient(160deg,#c8bbf0 0%,#d4c5f5 30%,#e0ceee 60%,#edd5e8 100%);min-height:100vh;color:#0d2b35;padding:28px 20px 40px}
+.wrap{max-width:680px;margin:0 auto}
+
+.top-logo{text-align:center;margin-bottom:20px}
+.top-logo span{font-size:15px;font-weight:600;color:#0d2b35;letter-spacing:-0.01em}
+.top-logo span em{font-style:normal;color:#6B4FBB}
+
+h2{font-family:'Fraunces',serif;font-size:clamp(24px,4vw,34px);font-weight:900;line-height:1.1;letter-spacing:-0.025em;color:#0d2b35;text-align:center;margin-bottom:5px}
+h2 em{font-style:italic;color:#6B4FBB}
+.subtitle{font-size:13px;color:#0d2b35;opacity:.55;text-align:center;margin-bottom:20px;line-height:1.5;font-weight:300}
+
+/* UNIT TOGGLE */
+.unit-toggle{display:flex;background:rgba(255,255,255,.5);border-radius:100px;padding:3px;margin-bottom:20px;border:1px solid rgba(255,255,255,.8);width:fit-content;margin-left:auto;margin-right:auto}
+.utbtn{padding:6px 18px;border-radius:100px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;background:transparent;color:#0d2b35;opacity:.5;transition:all .18s}
+.utbtn.on{background:#0d2b35;color:#fff;opacity:1}
+
+/* CARD */
+.card{background:rgba(255,255,255,.58);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:22px;padding:24px;border:1px solid rgba(255,255,255,.82);margin-bottom:12px}
+.card-title{font-family:'Fraunces',serif;font-size:16px;font-weight:800;color:#0d2b35;margin-bottom:18px;letter-spacing:-0.02em}
+
+/* FORM */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.full{grid-column:1/-1}
+label{font-size:11px;font-weight:600;color:#0d2b35;opacity:.55;letter-spacing:.07em;text-transform:uppercase}
+.input-group{display:flex;gap:6px}
+input[type=number]{background:rgba(255,255,255,.78);border:1.5px solid rgba(13,43,53,.12);border-radius:10px;padding:10px 12px;font-size:15px;color:#0d2b35;font-family:'DM Sans',sans-serif;outline:none;width:100%;-moz-appearance:textfield;transition:border-color .2s}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]:focus{border-color:#6B4FBB;background:#fff}
+.unit-suffix{display:flex;align-items:center;justify-content:center;background:rgba(13,43,53,.06);border:1.5px solid rgba(13,43,53,.08);border-radius:10px;padding:0 12px;font-size:12px;font-weight:600;color:#0d2b35;opacity:.5;white-space:nowrap;flex-shrink:0;height:42px}
+.ft-wrap{display:flex;gap:6px;width:100%}
+.ft-wrap input{flex:1}
+.ft-label{font-size:11px;color:#0d2b35;opacity:.4;align-self:center;flex-shrink:0}
+
+/* GENDER */
+.grow{display:flex;gap:8px}
+.gbtn{flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid rgba(13,43,53,.12);background:rgba(255,255,255,.6);font-size:14px;font-weight:500;color:#0d2b35;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s}
+.gbtn.on{background:#0d2b35;color:#fff;border-color:#0d2b35}
+
+/* SELECT */
+.swrap{position:relative}
+.swrap::after{content:'↓';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;pointer-events:none;color:#0d2b35;opacity:.4}
+select{background:rgba(255,255,255,.78);border:1.5px solid rgba(13,43,53,.12);border-radius:10px;padding:10px 12px;font-size:13px;color:#0d2b35;font-family:'DM Sans',sans-serif;outline:none;width:100%;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .2s}
+select:focus{border-color:#6B4FBB}
+
+/* GOAL */
+.ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ggoal{padding:9px 4px;border-radius:10px;border:1.5px solid rgba(13,43,53,.12);background:rgba(255,255,255,.6);font-size:11px;font-weight:500;color:#0d2b35;cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif;line-height:1.3;transition:all .18s}
+.ggoal.on{border-color:#6B4FBB;background:rgba(107,79,187,.12);color:#5B3DB8}
+
+.cbtn{width:100%;margin-top:16px;padding:13px;border-radius:100px;background:#0d2b35;color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.cbtn:hover{background:#1a4a5a;transform:translateY(-1px)}
+.error{background:rgba(231,111,81,.12);border:1px solid rgba(231,111,81,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#8b3a1f;margin-top:10px;display:none;line-height:1.5}
+.error.show{display:block}
+
+/* RESULT — always visible, starts dimmed */
+.rcard{background:#0d2b35;border-radius:22px;padding:26px;opacity:.45;transition:opacity .5s ease}
+.rcard.active{opacity:1}
+.rcard.active .r-num{animation:countUp .4s ease}
+@keyframes countUp{from{transform:scale(.85);opacity:.3}to{transform:scale(1);opacity:1}}
+
+.rtop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.r-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:.07em;text-transform:uppercase}
+.r-sub{font-size:11px;color:rgba(255,255,255,.28);margin-top:3px}
+.r-num-wrap{text-align:right}
+.r-num{font-family:'Fraunces',serif;font-size:50px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.03em}
+.r-unit{font-size:12px;color:rgba(255,255,255,.38);margin-top:3px}
+
+.gcards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.gc{border-radius:13px;padding:12px;text-align:center}
+.gc-l{background:rgba(82,183,136,.14);border:1px solid rgba(82,183,136,.22)}
+.gc-m{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09)}
+.gc-g{background:rgba(244,162,97,.14);border:1px solid rgba(244,162,97,.2)}
+.gc-lbl{font-size:10px;color:rgba(255,255,255,.38);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.gc-n{font-family:'Fraunces',serif;font-size:22px;font-weight:800;line-height:1;margin-bottom:2px}
+.gc-l .gc-n{color:#52B788}
+.gc-m .gc-n{color:#fff}
+.gc-g .gc-n{color:#F4A261}
+.gc-s{font-size:10px;color:rgba(255,255,255,.32)}
+
+.mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.mc{background:rgba(255,255,255,.05);border-radius:12px;padding:11px;text-align:center;border:1px solid rgba(255,255,255,.07)}
+.mc-l{font-size:10px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.mc-v{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:#fff;line-height:1;margin-bottom:2px}
+.mc-u{font-size:10px;color:rgba(255,255,255,.3)}
+
+.bars{margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.bar-name{font-size:11px;color:rgba(255,255,255,.45);font-weight:500;width:48px;flex-shrink:0}
+.bar-track{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .7s ease}
+.bar-pct{font-size:11px;color:rgba(255,255,255,.38);width:28px;text-align:right;flex-shrink:0}
+
+.r-note{font-size:11px;color:rgba(255,255,255,.32);text-align:center;line-height:1.6;margin-bottom:14px}
+.r-cta{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.07);border-radius:13px;padding:12px 14px;border:1px solid rgba(255,255,255,.1);flex-wrap:wrap}
+.r-cta-t{font-size:12px;color:rgba(255,255,255,.55);line-height:1.4}
+.r-cta-t strong{color:#fff;display:block;font-size:13px;margin-bottom:2px}
+.r-cta-btn{background:#52B788;color:#fff;padding:8px 16px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;font-family:'DM Sans',sans-serif;flex-shrink:0}
+
+.hint{text-align:center;margin-top:10px;font-size:11px;color:rgba(255,255,255,.28);font-style:italic}
+.foot{text-align:center;margin-top:16px;font-size:11px;color:rgba(13,43,53,.4);line-height:1.6}
+
+@media(max-width:480px){
+  .fgrid{grid-template-columns:1fr}
+  .gcards{grid-template-columns:1fr}
+  .ggrid{grid-template-columns:1fr 1fr}
+  .mrow{grid-template-columns:1fr 1fr}
+  .rtop{flex-direction:column}
+  .r-num-wrap{text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-logo"><span>tou <em>calo</em></span></div>
+  <h2>Your TDEE, <em>instantly.</em></h2>
+  <p class="subtitle">Total Daily Energy Expenditure — the exact calories your body burns each day.</p>
+
+  <!-- UNIT TOGGLE -->
+  <div class="unit-toggle">
+    <button class="utbtn on" id="ut-metric" onclick="setUnit('metric')">Metric (kg / cm)</button>
+    <button class="utbtn" id="ut-imperial" onclick="setUnit('imperial')">Imperial (lbs / ft)</button>
+  </div>
+
+  <!-- INPUT CARD -->
+  <div class="card">
+    <div class="card-title">Your details</div>
+    <div class="fgrid">
+
+      <div class="field full">
+        <label>Gender</label>
+        <div class="grow">
+          <button class="gbtn on" id="bm" onclick="setG('male')">Male</button>
+          <button class="gbtn" id="bf" onclick="setG('female')">Female</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Age</label>
+        <div class="input-group">
+          <input type="number" id="age" placeholder="25" min="10" max="100">
+          <span class="unit-suffix">yrs</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label id="wt-label">Weight (kg)</label>
+        <div class="input-group">
+          <input type="number" id="wt" placeholder="70" min="30" max="660">
+          <span class="unit-suffix" id="wt-unit">kg</span>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label id="ht-label">Height (cm)</label>
+        <!-- Metric height -->
+        <div id="ht-metric" class="input-group">
+          <input type="number" id="ht-cm" placeholder="170" min="100" max="250">
+          <span class="unit-suffix">cm</span>
+        </div>
+        <!-- Imperial height (hidden by default) -->
+        <div id="ht-imperial" class="ft-wrap" style="display:none">
+          <input type="number" id="ht-ft" placeholder="5" min="3" max="8">
+          <span class="ft-label">ft</span>
+          <input type="number" id="ht-in" placeholder="11" min="0" max="11">
+          <span class="ft-label">in</span>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>Activity level</label>
+        <div class="swrap">
+          <select id="act">
+            <option value="1.2">Sedentary – little or no exercise</option>
+            <option value="1.375">Lightly active – light exercise 1–3 days/week</option>
+            <option value="1.55" selected>Moderately active – moderate exercise 3–5 days/week</option>
+            <option value="1.725">Very active – hard exercise 6–7 days/week</option>
+            <option value="1.9">Extra active – very hard exercise or physical job</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>Your goal</label>
+        <div class="ggrid">
+          <button class="ggoal" id="gl" onclick="setGoal('loss')">🔥 Lose weight</button>
+          <button class="ggoal on" id="gm" onclick="setGoal('maintain')">⚖️ Maintain</button>
+          <button class="ggoal" id="gg" onclick="setGoal('gain')">💪 Build muscle</button>
+        </div>
+      </div>
+
+    </div>
+    <button class="cbtn" onclick="calc()">Calculate My TDEE →</button>
+    <div class="error" id="err">Please fill in all fields with valid values.</div>
+  </div>
+
+  <!-- RESULT CARD — always rendered, dimmed until calculated -->
+  <div class="rcard" id="res">
+    <div class="rtop">
+      <div>
+        <div class="r-lbl">Your TDEE</div>
+        <div class="r-sub">Total Daily Energy Expenditure · Mifflin-St Jeor</div>
+      </div>
+      <div class="r-num-wrap">
+        <div class="r-num" id="rn">—</div>
+        <div class="r-unit">kcal / day</div>
+      </div>
+    </div>
+
+    <div class="gcards">
+      <div class="gc gc-l">
+        <div class="gc-lbl">Lose weight</div>
+        <div class="gc-n" id="rl">—</div>
+        <div class="gc-s">kcal/day</div>
+      </div>
+      <div class="gc gc-m">
+        <div class="gc-lbl">Maintain</div>
+        <div class="gc-n" id="rm">—</div>
+        <div class="gc-s">kcal/day</div>
+      </div>
+      <div class="gc gc-g">
+        <div class="gc-lbl">Build muscle</div>
+        <div class="gc-n" id="rg">—</div>
+        <div class="gc-s">kcal/day</div>
+      </div>
+    </div>
+
+    <div class="mrow">
+      <div class="mc"><div class="mc-l">Protein</div><div class="mc-v" id="mp">—</div><div class="mc-u">g/day</div></div>
+      <div class="mc"><div class="mc-l">Carbs</div><div class="mc-v" id="mc">—</div><div class="mc-u">g/day</div></div>
+      <div class="mc"><div class="mc-l">Fat</div><div class="mc-v" id="mf">—</div><div class="mc-u">g/day</div></div>
+    </div>
+
+    <div class="bars">
+      <div class="bar-row">
+        <span class="bar-name">Protein</span>
+        <div class="bar-track"><div class="bar-fill" id="bp" style="background:#52B788;width:0%"></div></div>
+        <span class="bar-pct" id="bpp">—</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-name">Carbs</span>
+        <div class="bar-track"><div class="bar-fill" id="bc" style="background:#6B4FBB;width:0%"></div></div>
+        <span class="bar-pct" id="bcp">—</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-name">Fat</span>
+        <div class="bar-track"><div class="bar-fill" id="bf2" style="background:#F4A261;width:0%"></div></div>
+        <span class="bar-pct" id="bfp">—</span>
+      </div>
+    </div>
+
+    <div class="r-note">Macros calculated for your selected goal · 2g protein per kg body weight</div>
+
+    <div class="r-cta">
+      <div class="r-cta-t">
+        <strong>Track every meal against your TDEE</strong>
+        Snap a photo — Tou Calo counts calories in 3 seconds
+      </div>
+      <a href="https://apps.apple.com/us/app/tou-calo-ai-calorie-counter/id6698870692" class="r-cta-btn">Download Free</a>
+    </div>
+
+    <p class="hint" id="hint-text">Fill in your details above and click Calculate</p>
+  </div>
+
+  <p class="foot">Formula: Mifflin-St Jeor · Results are estimates. Consult a professional for medical advice.</p>
+</div>
+
+<script>
+var g='male', goal='maintain', unit='metric';
+
+function setUnit(u){
+  unit=u;
+  document.getElementById('ut-metric').classList.toggle('on',u==='metric');
+  document.getElementById('ut-imperial').classList.toggle('on',u==='imperial');
+  // weight
+  document.getElementById('wt-label').textContent=u==='metric'?'Weight (kg)':'Weight (lbs)';
+  document.getElementById('wt-unit').textContent=u==='metric'?'kg':'lbs';
+  document.getElementById('wt').placeholder=u==='metric'?'70':'154';
+  // height
+  document.getElementById('ht-label').textContent=u==='metric'?'Height (cm)':'Height';
+  document.getElementById('ht-metric').style.display=u==='metric'?'flex':'none';
+  document.getElementById('ht-imperial').style.display=u==='imperial'?'flex':'none';
+}
+
+function setG(v){
+  g=v;
+  document.getElementById('bm').className='gbtn'+(v==='male'?' on':'');
+  document.getElementById('bf').className='gbtn'+(v==='female'?' on':'');
+}
+
+function setGoal(v){
+  goal=v;
+  document.getElementById('gl').className='ggoal'+(v==='loss'?' on':'');
+  document.getElementById('gm').className='ggoal'+(v==='maintain'?' on':'');
+  document.getElementById('gg').className='ggoal'+(v==='gain'?' on':'');
+}
+
+function getWeightKg(){
+  var w=parseFloat(document.getElementById('wt').value);
+  if(!w) return null;
+  return unit==='imperial'?w*0.453592:w;
+}
+
+function getHeightCm(){
+  if(unit==='metric'){
+    var h=parseFloat(document.getElementById('ht-cm').value);
+    return h||null;
+  } else {
+    var ft=parseFloat(document.getElementById('ht-ft').value)||0;
+    var inch=parseFloat(document.getElementById('ht-in').value)||0;
+    if(!ft&&!inch) return null;
+    return (ft*30.48)+(inch*2.54);
+  }
+}
+
+function calc(){
+  var err=document.getElementById('err');
+  var a=parseFloat(document.getElementById('age').value);
+  var w=getWeightKg();
+  var h=getHeightCm();
+  var act=parseFloat(document.getElementById('act').value);
+
+  if(!a||!w||!h||a<10||a>100||w<30||w>300||h<100||h>250){
+    err.classList.add('show');return;
+  }
+  err.classList.remove('show');
+
+  var bmr=g==='male'?(10*w+6.25*h-5*a+5):(10*w+6.25*h-5*a-161);
+  var tdee=Math.round(bmr*act);
+  var loss=Math.max(tdee-500,1200);
+  var gain=tdee+300;
+  var target=goal==='loss'?loss:goal==='gain'?gain:tdee;
+
+  var pro=Math.round(w*2.0);
+  var fat=Math.round(target*.25/9);
+  var carb=Math.max(Math.round((target-pro*4-fat*9)/4),0);
+  var tot=pro*4+carb*4+fat*9;
+  var pPct=Math.round(pro*4/tot*100);
+  var cPct=Math.round(carb*4/tot*100);
+  var fPct=Math.round(fat*9/tot*100);
+
+  document.getElementById('rn').textContent=tdee.toLocaleString();
+  document.getElementById('rl').textContent=loss.toLocaleString();
+  document.getElementById('rm').textContent=tdee.toLocaleString();
+  document.getElementById('rg').textContent=gain.toLocaleString();
+  document.getElementById('mp').textContent=pro;
+  document.getElementById('mc').textContent=carb;
+  document.getElementById('mf').textContent=fat;
+
+  setTimeout(function(){
+    document.getElementById('bp').style.width=pPct+'%';
+    document.getElementById('bc').style.width=cPct+'%';
+    document.getElementById('bf2').style.width=fPct+'%';
+  },50);
+  document.getElementById('bpp').textContent=pPct+'%';
+  document.getElementById('bcp').textContent=cPct+'%';
+  document.getElementById('bfp').textContent=fPct+'%';
+
+  document.getElementById('res').classList.add('active');
+  document.getElementById('hint-text').style.display='none';
+  sendHeight();
+}
+
+function sendHeight(){
+  try{window.parent.postMessage({type:'resize',height:document.body.scrollHeight+40},'*');}catch(e){}
+}
+window.addEventListener('load',sendHeight);
+</script>
+</body>
+</html>
