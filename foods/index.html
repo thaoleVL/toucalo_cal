@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Calorie Encyclopedia — Tou Calo</title>
+<meta name="description" content="Calories, protein, carbs and fat for 60+ common foods. Searchable, filterable, per 100g and per serving — from Tou Calo, the AI calorie counter.">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,800;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:linear-gradient(160deg,#c8bbf0 0%,#d4c5f5 30%,#e0ceee 60%,#edd5e8 100%);min-height:100vh;color:#0d2b35;padding:28px 20px 48px}
+.wrap{max-width:760px;margin:0 auto}
+.top-logo{text-align:center;margin-bottom:18px}
+.top-logo span{font-size:15px;font-weight:600;color:#0d2b35}
+.top-logo span em{font-style:normal;color:#6B4FBB}
+h2{font-family:'Fraunces',serif;font-size:clamp(24px,4vw,34px);font-weight:900;line-height:1.1;letter-spacing:-0.025em;color:#0d2b35;text-align:center;margin-bottom:5px}
+h2 em{font-style:italic;color:#6B4FBB}
+.subtitle{font-size:13px;color:#0d2b35;opacity:.55;text-align:center;margin-bottom:22px;line-height:1.5;font-weight:300}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap::before{content:'🔍';position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+.search-input{width:100%;background:rgba(255,255,255,.75);border:1.5px solid rgba(255,255,255,.9);border-radius:14px;padding:13px 16px 13px 42px;font-size:15px;color:#0d2b35;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.search-input:focus{border-color:#6B4FBB;background:#fff}
+.search-input::placeholder{color:#0d2b35;opacity:.4}
+
+/* CATEGORY FILTER */
+.cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.cat-btn{padding:7px 14px;border-radius:100px;border:1.5px solid rgba(13,43,53,.12);background:rgba(255,255,255,.6);font-size:12px;font-weight:500;color:#0d2b35;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s;white-space:nowrap}
+.cat-btn.on{background:#0d2b35;color:#fff;border-color:#0d2b35}
+
+/* STATS ROW */
+.stats-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stat-pill{background:rgba(255,255,255,.5);border-radius:100px;padding:6px 14px;font-size:12px;color:#0d2b35;opacity:.7;border:1px solid rgba(255,255,255,.7)}
+.stat-pill strong{font-weight:600;opacity:1}
+
+/* TABLE CARD */
+.table-card{background:rgba(255,255,255,.58);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,.82);margin-bottom:14px}
+.table-header{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:0;background:rgba(13,43,53,.06);padding:10px 16px;border-bottom:1px solid rgba(13,43,53,.08)}
+.th{font-size:10px;font-weight:700;color:#0d2b35;opacity:.5;letter-spacing:.06em;text-transform:uppercase;text-align:right}
+.th:first-child{text-align:left}
+.food-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:0;padding:10px 16px;border-bottom:0.5px solid rgba(13,43,53,.06);transition:background .15s;cursor:default;align-items:center}
+.food-row:last-child{border-bottom:none}
+.food-row:hover{background:rgba(255,255,255,.4)}
+.food-row.hidden{display:none}
+.food-name{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#0d2b35}
+.food-icon{font-size:16px;flex-shrink:0}
+.food-cat-badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;opacity:.7}
+.td{font-size:12px;color:#0d2b35;text-align:right}
+.td.kcal{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:#0d2b35}
+.td.protein{color:#1a6b45}
+.td.carbs{color:#5B3DB8}
+.td.fat{color:#B84A2A}
+.no-results{text-align:center;padding:32px;font-size:13px;color:#0d2b35;opacity:.45;display:none}
+.no-results.show{display:block}
+
+/* CATEGORY COLORS */
+.cat-fruit{background:rgba(244,162,97,.15);color:#B84A2A}
+.cat-protein{background:rgba(82,183,136,.15);color:#1a6b45}
+.cat-carbs{background:rgba(107,79,187,.12);color:#5B3DB8}
+.cat-veg{background:rgba(82,183,136,.2);color:#0d5c3a}
+.cat-dairy{background:rgba(255,255,255,.5);color:#555}
+.cat-fast{background:rgba(231,111,81,.15);color:#8b3a1f}
+.cat-snacks{background:rgba(244,162,97,.2);color:#7a4800}
+.cat-drinks{background:rgba(107,79,187,.15);color:#3c2882}
+
+/* SERVING NOTE */
+.serving-note{font-size:11px;color:#0d2b35;opacity:.4;text-align:center;padding:8px 16px;background:rgba(13,43,53,.03)}
+
+/* CTA */
+.cta-card{background:#0d2b35;border-radius:20px;padding:22px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.cta-text{}
+.cta-title{font-family:'Fraunces',serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2}
+.cta-sub{font-size:12px;color:rgba(255,255,255,.55);line-height:1.4}
+.cta-btn{background:#52B788;color:#fff;padding:10px 18px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;font-family:'DM Sans',sans-serif;flex-shrink:0;margin-left:auto}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:10px}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#0d2b35;opacity:.6}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.foot{text-align:center;font-size:11px;color:rgba(13,43,53,.4);line-height:1.6}
+
+/* BACK LINK */
+.back-link{display:inline-block;margin-bottom:12px;font-size:12px;color:#0d2b35;opacity:.6;text-decoration:none;font-weight:500}
+.back-link:hover{opacity:1;color:#6B4FBB}
+
+@media(max-width:500px){
+  .table-header,.food-row{grid-template-columns:2fr 1fr 1fr}
+  .th:nth-child(4),.th:nth-child(5),.td:nth-child(4),.td:nth-child(5){display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="../" class="back-link">← All calculators</a>
+  <div class="top-logo"><span>tou <em>calo</em></span></div>
+  <h2>Food Calorie <em>Encyclopedia</em></h2>
+  <p class="subtitle">Calories, protein, carbs and fat for 60+ common foods. Per 100g and per serving.</p>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <input type="text" class="search-input" id="search" placeholder="Search any food — apple, chicken, rice..." oninput="filterFoods()">
+  </div>
+
+  <!-- CATEGORY FILTER -->
+  <div class="cats">
+    <button class="cat-btn on" onclick="setFilter('all',this)">All foods</button>
+    <button class="cat-btn" onclick="setFilter('fruit',this)">🍎 Fruits</button>
+    <button class="cat-btn" onclick="setFilter('protein',this)">🍗 Proteins</button>
+    <button class="cat-btn" onclick="setFilter('carbs',this)">🍚 Carbs</button>
+    <button class="cat-btn" onclick="setFilter('veg',this)">🥦 Vegetables</button>
+    <button class="cat-btn" onclick="setFilter('dairy',this)">🥛 Dairy</button>
+    <button class="cat-btn" onclick="setFilter('fast',this)">🍔 Fast food</button>
+    <button class="cat-btn" onclick="setFilter('snacks',this)">🍫 Snacks</button>
+    <button class="cat-btn" onclick="setFilter('drinks',this)">☕ Drinks</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-pill"><strong id="count">60</strong> foods shown</div>
+    <div class="stat-pill">Per <strong>100g</strong> · hover for serving size</div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-header">
+      <div class="th">Food</div>
+      <div class="th">Calories</div>
+      <div class="th">Protein</div>
+      <div class="th">Carbs</div>
+      <div class="th">Fat</div>
+    </div>
+    <div id="food-list"></div>
+    <div class="no-results" id="no-results">No foods found. Try a different search.</div>
+    <div class="serving-note">All values per 100g · *cooked weight · tap Tou Calo to log any food instantly</div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#1a6b45"></div>Protein</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#5B3DB8"></div>Carbs</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#B84A2A"></div>Fat</div>
+  </div>
+
+  <div class="cta-card">
+    <div class="cta-text">
+      <div class="cta-title">Snap any meal — AI counts the calories instantly</div>
+      <div class="cta-sub">Tou Calo identifies food from a photo in 3 seconds. No manual searching required.</div>
+    </div>
+    <a href="https://apps.apple.com/us/app/tou-calo-ai-calorie-counter/id6698870692" class="cta-btn">Download Free</a>
+  </div>
+
+  <p class="foot">Values are averages · Sources: USDA FoodData Central · Always check packaging for exact nutrition</p>
+</div>
+
+<script>
+var activeFilter = 'all';
+
+var foods = [
+  // FRUITS
+  {icon:'🍎',name:'Apple',cat:'fruit',kcal:52,p:0.3,c:14,f:0.2,serving:'1 medium (182g) = 95 kcal'},
+  {icon:'🍌',name:'Banana',cat:'fruit',kcal:89,p:1.1,c:23,f:0.3,serving:'1 medium (118g) = 105 kcal'},
+  {icon:'🥑',name:'Avocado',cat:'fruit',kcal:160,p:2.0,c:9,f:15,serving:'½ avocado (68g) = 109 kcal'},
+  {icon:'🍊',name:'Orange',cat:'fruit',kcal:47,p:0.9,c:12,f:0.1,serving:'1 medium (131g) = 62 kcal'},
+  {icon:'🥭',name:'Mango',cat:'fruit',kcal:60,p:0.8,c:15,f:0.4,serving:'1 cup (165g) = 99 kcal'},
+  {icon:'🍇',name:'Grapes',cat:'fruit',kcal:69,p:0.7,c:18,f:0.2,serving:'1 cup (151g) = 104 kcal'},
+  {icon:'🍓',name:'Strawberry',cat:'fruit',kcal:32,p:0.7,c:8,f:0.3,serving:'1 cup (152g) = 49 kcal'},
+  {icon:'🍉',name:'Watermelon',cat:'fruit',kcal:30,p:0.6,c:8,f:0.2,serving:'1 cup diced (154g) = 46 kcal'},
+  {icon:'🍑',name:'Peach',cat:'fruit',kcal:39,p:0.9,c:10,f:0.3,serving:'1 medium (150g) = 59 kcal'},
+  {icon:'🍋',name:'Lemon',cat:'fruit',kcal:29,p:1.1,c:9,f:0.3,serving:'1 medium (58g) = 17 kcal'},
+  {icon:'🍍',name:'Pineapple',cat:'fruit',kcal:50,p:0.5,c:13,f:0.1,serving:'1 cup (165g) = 83 kcal'},
+  {icon:'🫐',name:'Blueberry',cat:'fruit',kcal:57,p:0.7,c:14,f:0.3,serving:'1 cup (148g) = 84 kcal'},
+  {icon:'🍒',name:'Cherry',cat:'fruit',kcal:63,p:1.1,c:16,f:0.2,serving:'1 cup (138g) = 87 kcal'},
+  {icon:'🥝',name:'Kiwi',cat:'fruit',kcal:61,p:1.1,c:15,f:0.5,serving:'1 medium (76g) = 46 kcal'},
+  {icon:'🍐',name:'Pear',cat:'fruit',kcal:57,p:0.4,c:15,f:0.1,serving:'1 medium (178g) = 101 kcal'},
+  // PROTEINS
+  {icon:'🍗',name:'Chicken breast*',cat:'protein',kcal:165,p:31,c:0,f:3.6,serving:'1 breast (174g) = 287 kcal'},
+  {icon:'🥚',name:'Egg (whole)',cat:'protein',kcal:155,p:13,c:1.1,f:11,serving:'1 large (50g) = 78 kcal'},
+  {icon:'🐟',name:'Salmon*',cat:'protein',kcal:208,p:20,c:0,f:13,serving:'1 fillet (178g) = 370 kcal'},
+  {icon:'🥩',name:'Beef (lean)*',cat:'protein',kcal:250,p:26,c:0,f:15,serving:'3oz (85g) = 213 kcal'},
+  {icon:'🫘',name:'Tofu (firm)',cat:'protein',kcal:76,p:8,c:2,f:4.8,serving:'½ cup (126g) = 96 kcal'},
+  {icon:'🍤',name:'Shrimp*',cat:'protein',kcal:99,p:24,c:0.2,f:0.3,serving:'3oz (85g) = 84 kcal'},
+  {icon:'🦃',name:'Turkey breast*',cat:'protein',kcal:135,p:30,c:0,f:1,serving:'3oz (85g) = 115 kcal'},
+  {icon:'🐟',name:'Tuna (canned)',cat:'protein',kcal:116,p:26,c:0,f:1,serving:'½ can (85g) = 99 kcal'},
+  {icon:'🥛',name:'Greek yogurt',cat:'protein',kcal:97,p:9,c:6,f:5,serving:'½ cup (113g) = 110 kcal'},
+  {icon:'🫘',name:'Black beans*',cat:'protein',kcal:132,p:9,c:24,f:0.5,serving:'½ cup (86g) = 114 kcal'},
+  {icon:'🥜',name:'Peanut butter',cat:'protein',kcal:588,p:25,c:20,f:50,serving:'2 tbsp (32g) = 188 kcal'},
+  {icon:'🥩',name:'Pork loin*',cat:'protein',kcal:242,p:27,c:0,f:14,serving:'3oz (85g) = 206 kcal'},
+  // CARBS
+  {icon:'🍚',name:'White rice*',cat:'carbs',kcal:130,p:2.7,c:28,f:0.3,serving:'1 cup cooked (186g) = 242 kcal'},
+  {icon:'🍚',name:'Brown rice*',cat:'carbs',kcal:111,p:2.6,c:23,f:0.9,serving:'1 cup cooked (195g) = 216 kcal'},
+  {icon:'🍞',name:'White bread',cat:'carbs',kcal:265,p:9,c:49,f:3.2,serving:'1 slice (30g) = 80 kcal'},
+  {icon:'🍞',name:'Whole wheat bread',cat:'carbs',kcal:247,p:13,c:41,f:4.2,serving:'1 slice (30g) = 74 kcal'},
+  {icon:'🍝',name:'Pasta*',cat:'carbs',kcal:131,p:5,c:25,f:1.1,serving:'1 cup cooked (140g) = 183 kcal'},
+  {icon:'🥔',name:'Potato (baked)',cat:'carbs',kcal:93,p:2.5,c:21,f:0.1,serving:'1 medium (173g) = 161 kcal'},
+  {icon:'🥣',name:'Oatmeal*',cat:'carbs',kcal:68,p:2.4,c:12,f:1.4,serving:'1 cup cooked (234g) = 159 kcal'},
+  {icon:'🌽',name:'Sweet corn*',cat:'carbs',kcal:86,p:3.3,c:19,f:1.4,serving:'1 ear (77g) = 66 kcal'},
+  {icon:'🫓',name:'Flour tortilla',cat:'carbs',kcal:290,p:7.8,c:49,f:7,serving:'1 medium (45g) = 131 kcal'},
+  {icon:'🥐',name:'Croissant',cat:'carbs',kcal:406,p:8.2,c:45,f:21,serving:'1 medium (57g) = 231 kcal'},
+  {icon:'🍿',name:'Popcorn (plain)',cat:'carbs',kcal:375,p:11,c:74,f:4.5,serving:'1 cup popped (8g) = 30 kcal'},
+  {icon:'🍠',name:'Sweet potato*',cat:'carbs',kcal:86,p:1.6,c:20,f:0.1,serving:'1 medium (114g) = 103 kcal'},
+  // VEGETABLES
+  {icon:'🥦',name:'Broccoli',cat:'veg',kcal:34,p:2.8,c:7,f:0.4,serving:'1 cup (91g) = 31 kcal'},
+  {icon:'🥬',name:'Spinach',cat:'veg',kcal:23,p:2.9,c:3.6,f:0.4,serving:'1 cup (30g) = 7 kcal'},
+  {icon:'🥕',name:'Carrot',cat:'veg',kcal:41,p:0.9,c:10,f:0.2,serving:'1 medium (61g) = 25 kcal'},
+  {icon:'🍅',name:'Tomato',cat:'veg',kcal:18,p:0.9,c:3.9,f:0.2,serving:'1 medium (123g) = 22 kcal'},
+  {icon:'🥒',name:'Cucumber',cat:'veg',kcal:16,p:0.7,c:4,f:0.1,serving:'½ cup (52g) = 8 kcal'},
+  {icon:'🧅',name:'Onion',cat:'veg',kcal:40,p:1.1,c:9,f:0.1,serving:'1 medium (110g) = 44 kcal'},
+  {icon:'🫑',name:'Bell pepper',cat:'veg',kcal:31,p:1,c:6,f:0.3,serving:'1 medium (119g) = 37 kcal'},
+  {icon:'🥗',name:'Kale',cat:'veg',kcal:49,p:4.3,c:9,f:0.9,serving:'1 cup (67g) = 33 kcal'},
+  {icon:'🧄',name:'Garlic',cat:'veg',kcal:149,p:6.4,c:33,f:0.5,serving:'1 clove (3g) = 4 kcal'},
+  {icon:'🍄',name:'Mushroom',cat:'veg',kcal:22,p:3.1,c:3.3,f:0.3,serving:'1 cup (70g) = 15 kcal'},
+  // DAIRY
+  {icon:'🥛',name:'Whole milk',cat:'dairy',kcal:61,p:3.2,c:4.8,f:3.3,serving:'1 cup (244ml) = 149 kcal'},
+  {icon:'🧀',name:'Cheddar cheese',cat:'dairy',kcal:403,p:25,c:1.3,f:33,serving:'1 oz (28g) = 113 kcal'},
+  {icon:'🧈',name:'Butter',cat:'dairy',kcal:717,p:0.9,c:0.1,f:81,serving:'1 tbsp (14g) = 100 kcal'},
+  {icon:'🥛',name:'Skimmed milk',cat:'dairy',kcal:34,p:3.4,c:5,f:0.2,serving:'1 cup (244ml) = 83 kcal'},
+  {icon:'🧁',name:'Cream cheese',cat:'dairy',kcal:342,p:6,c:4.1,f:34,serving:'2 tbsp (29g) = 99 kcal'},
+  {icon:'🍦',name:'Ice cream (vanilla)',cat:'dairy',kcal:207,p:3.5,c:24,f:11,serving:'½ cup (66g) = 137 kcal'},
+  // FAST FOOD
+  {icon:'🍔',name:'Big Mac',cat:'fast',kcal:257,p:13,c:24,f:12,serving:'1 burger (219g) = 563 kcal'},
+  {icon:'🍟',name:"McDonald's fries (M)",cat:'fast',kcal:323,p:3.8,c:42,f:16,serving:'1 serving (117g) = 378 kcal'},
+  {icon:'🌯',name:'Chipotle burrito',cat:'fast',kcal:190,p:10,c:22,f:7,serving:'1 burrito (~500g) = 950 kcal'},
+  {icon:'🥙',name:'Subway 6-inch (turkey)',cat:'fast',kcal:180,p:12,c:30,f:3,serving:'1 sub (230g) = 414 kcal'},
+  {icon:'🍗',name:'KFC Original chicken',cat:'fast',kcal:295,p:23,c:10,f:18,serving:'1 piece (107g) = 316 kcal'},
+  {icon:'🌮',name:'Taco Bell soft taco',cat:'fast',kcal:218,p:10,c:22,f:10,serving:'1 taco (99g) = 216 kcal'},
+  {icon:'🍕',name:'Pizza Margherita',cat:'fast',kcal:266,p:11,c:33,f:10,serving:'1 slice (107g) = 285 kcal'},
+  // SNACKS
+  {icon:'🍫',name:'Dark chocolate',cat:'snacks',kcal:598,p:7.8,c:46,f:43,serving:'1 square (10g) = 60 kcal'},
+  {icon:'🥜',name:'Almonds',cat:'snacks',kcal:579,p:21,c:22,f:50,serving:'1 oz (28g) = 162 kcal'},
+  {icon:'🥜',name:'Cashews',cat:'snacks',kcal:553,p:18,c:30,f:44,serving:'1 oz (28g) = 155 kcal'},
+  {icon:'🍪',name:'Chocolate chip cookie',cat:'snacks',kcal:488,p:5.4,c:63,f:24,serving:'1 cookie (28g) = 137 kcal'},
+  {icon:'🥨',name:'Pretzels',cat:'snacks',kcal:380,p:9.3,c:80,f:3.4,serving:'10 twists (60g) = 228 kcal'},
+  {icon:'🍩',name:'Donut (glazed)',cat:'snacks',kcal:452,p:4.9,c:51,f:25,serving:'1 donut (60g) = 271 kcal'},
+  // DRINKS
+  {icon:'☕',name:'Coffee (black)',cat:'drinks',kcal:2,p:0.3,c:0,f:0,serving:'1 cup (240ml) = 5 kcal'},
+  {icon:'🧃',name:'Orange juice',cat:'drinks',kcal:45,p:0.7,c:10,f:0.2,serving:'1 cup (248ml) = 112 kcal'},
+  {icon:'🥤',name:'Coca Cola',cat:'drinks',kcal:42,p:0,c:11,f:0,serving:'1 can (355ml) = 140 kcal'},
+  {icon:'🍺',name:'Beer (regular)',cat:'drinks',kcal:43,p:0.5,c:3.6,f:0,serving:'1 can (355ml) = 153 kcal'},
+  {icon:'🍵',name:'Green tea',cat:'drinks',kcal:1,p:0.2,c:0,f:0,serving:'1 cup (245ml) = 2 kcal'},
+  {icon:'🥛',name:'Almond milk (unsweetened)',cat:'drinks',kcal:13,p:0.4,c:0.3,f:1.1,serving:'1 cup (240ml) = 31 kcal'},
+];
+
+var currentFilter = 'all';
+
+function render(list) {
+  var el = document.getElementById('food-list');
+  var nr = document.getElementById('no-results');
+  if (!list.length) { el.innerHTML = ''; nr.classList.add('show'); document.getElementById('count').textContent = 0; return; }
+  nr.classList.remove('show');
+  document.getElementById('count').textContent = list.length;
+  el.innerHTML = list.map(function(f) {
+    return '<div class="food-row" data-cat="'+f.cat+'" title="'+f.serving+'">' +
+      '<div class="food-name"><span class="food-icon">'+f.icon+'</span>'+f.name+'</div>' +
+      '<div class="td kcal">'+f.kcal+'</div>' +
+      '<div class="td protein">'+f.p+'g</div>' +
+      '<div class="td carbs">'+f.c+'g</div>' +
+      '<div class="td fat">'+f.f+'g</div>' +
+    '</div>';
+  }).join('');
+}
+
+function filterFoods() {
+  var q = document.getElementById('search').value.toLowerCase().trim();
+  var filtered = foods.filter(function(f) {
+    var matchCat = currentFilter === 'all' || f.cat === currentFilter;
+    var matchQ = !q || f.name.toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+  render(filtered);
+}
+
+function setFilter(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('on'); });
+  btn.classList.add('on');
+  filterFoods();
+}
+
+render(foods);
+</script>
+</body>
+</html>
